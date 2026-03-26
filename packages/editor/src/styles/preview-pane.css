@@ -1,0 +1,21 @@
+/* ─── PreviewPane styles ──────────────────────────────────────────────────── */
+
+.mf-preview-container {
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+  background: var(--mf-bg-primary);
+  color: var(--mf-text-primary);
+}
+
+@media (min-width: 768px) {
+  .mf-preview-container {
+    padding: 24px 32px;
+  }
+}
+
+.mf-preview-empty {
+  color: var(--mf-text-muted);
+  font-size: 14px;
+  font-style: italic;
+}

@@ -1,0 +1,283 @@
+/* ─── Settings Modal styles ───────────────────────────────────────────────── */
+
+.mf-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.mf-modal {
+  background: var(--mf-bg-primary, #ffffff);
+  color: var(--mf-text-primary, #1f2937);
+  border: 1px solid var(--mf-border-color, #e5e7eb);
+  border-radius: var(--mf-border-radius, 8px);
+  padding: 24px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.mf-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.mf-modal-desc {
+  font-size: 12px;
+  color: var(--mf-text-muted, #9ca3af);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.mf-modal-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mf-text-secondary, #6b7280);
+  margin-bottom: 6px;
+}
+
+.mf-modal-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--mf-font-mono, monospace);
+  border: 1px solid var(--mf-border-color, #e5e7eb);
+  border-radius: 6px;
+  background: var(--mf-bg-secondary, #f9fafb);
+  color: var(--mf-text-primary, #1f2937);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.mf-modal-input:focus {
+  border-color: var(--mf-accent, #2563eb);
+  box-shadow: var(--mf-focus-ring, 0 0 0 2px rgba(37, 99, 235, 0.4));
+}
+
+.mf-modal-input::placeholder {
+  color: var(--mf-text-muted, #9ca3af);
+}
+
+.mf-modal-hint {
+  font-size: 11px;
+  color: var(--mf-text-muted, #9ca3af);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.mf-modal-hint a {
+  color: var(--mf-accent, #2563eb);
+  text-decoration: underline;
+}
+
+.mf-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.mf-modal-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--mf-border-color, #e5e7eb);
+  cursor: pointer;
+  transition: background-color 100ms;
+}
+
+.mf-modal-btn-secondary {
+  background: var(--mf-bg-primary, #ffffff);
+  color: var(--mf-text-primary, #1f2937);
+}
+
+.mf-modal-btn-secondary:hover {
+  background: var(--mf-btn-hover-bg, #f3f4f6);
+}
+
+.mf-modal-btn-primary {
+  background: var(--mf-accent, #2563eb);
+  color: #ffffff;
+  border-color: var(--mf-accent, #2563eb);
+}
+
+.mf-modal-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.mf-modal-status {
+  font-size: 12px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+.mf-modal-status-success {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.mf-modal-status-error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+/* ─── Test Upload Button ──────────────────────────────────────────────────── */
+
+.mf-modal-test-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--mf-border-color, #e5e7eb);
+  background: var(--mf-bg-secondary, #f9fafb);
+  color: var(--mf-text-primary, #1f2937);
+  cursor: pointer;
+  transition: background-color 100ms, opacity 100ms;
+}
+
+.mf-modal-test-btn:hover:not(:disabled) {
+  background: var(--mf-btn-hover-bg, #f3f4f6);
+}
+
+.mf-modal-test-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mf-modal-test-btn-loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* ─── Integration Badge & URL ─────────────────────────────────────────────── */
+
+.mf-modal-badge {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.mf-modal-test-url {
+  display: block;
+  font-size: 11px;
+  word-break: break-all;
+  opacity: 0.8;
+}
+
+/* ─── Image Upload Guide Modal ───────────────────────────────────────────── */
+
+.mf-guide-modal {
+  width: 460px;
+}
+
+.mf-guide-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.mf-guide-header-icon {
+  color: var(--mf-accent, #2563eb);
+  flex-shrink: 0;
+}
+
+.mf-guide-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mf-guide-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mf-guide-step-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  background: var(--mf-accent, #2563eb);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.mf-guide-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  padding-top: 2px;
+}
+
+.mf-guide-step-content strong {
+  font-weight: 600;
+  color: var(--mf-text-primary, #1f2937);
+}
+
+.mf-guide-step-desc {
+  font-size: 11px;
+  color: var(--mf-text-muted, #9ca3af);
+  line-height: 1.4;
+}
+
+.mf-guide-step-desc a {
+  color: var(--mf-accent, #2563eb);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.mf-guide-step-desc a:hover {
+  text-decoration: underline;
+}
+
+.mf-guide-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--mf-bg-secondary, #f9fafb);
+  border: 1px solid var(--mf-border-color, #e5e7eb);
+  font-size: 11px;
+  color: var(--mf-text-muted, #9ca3af);
+  line-height: 1.5;
+}
+
+.mf-guide-info a {
+  color: var(--mf-accent, #2563eb);
+  text-decoration: underline;
+}
+
+.mf-guide-info svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Primary button with icon */
+.mf-modal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

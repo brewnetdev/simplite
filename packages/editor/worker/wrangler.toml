@@ -1,0 +1,25 @@
+# ─── MarkFlow R2 Image Uploader ───────────────────────────────────────────────
+# 아래 값들을 본인의 Cloudflare 계정 정보로 교체하세요.
+# Replace the values below with your Cloudflare account info.
+
+name = "markflow-r2-uploader"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+# Cloudflare 계정 ID (Cloudflare 대시보드 → 우측 사이드바에서 확인)
+# account_id = "YOUR_ACCOUNT_ID"
+
+# ── R2 버킷 바인딩 ─────────────────────────────────────────────────────────────
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "markflow-images"       # R2 버킷 이름 (직접 생성 필요)
+
+# ── 환경 변수 ──────────────────────────────────────────────────────────────────
+[vars]
+# R2 버킷의 공개 URL (아래 중 하나 선택):
+#   - R2 커스텀 도메인: https://images.yourdomain.com
+#   - R2 퍼블릭 개발 URL: https://pub-xxxxxxxx.r2.dev
+PUBLIC_URL = "https://pub-YOUR_BUCKET_ID.r2.dev"
+
+# CORS 허용 오리진 (쉼표 구분, "*"이면 전체 허용)
+# ALLOWED_ORIGINS = "*"

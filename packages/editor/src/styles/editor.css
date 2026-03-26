@@ -1,0 +1,206 @@
+/* ─── MarkdownEditor — Root component styles ─────────────────────────────── */
+
+.mf-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--mf-border-radius);
+  border: 1px solid var(--mf-border-color);
+  background: var(--mf-bg-primary);
+}
+
+.mf-panes-container {
+  display: flex;
+  flex: 1 1 0%;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mf-pane-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mf-pane-half {
+  width: 50%;
+}
+
+.mf-pane-full {
+  width: 100%;
+}
+
+.mf-pane-border-right {
+  border-right: 1px solid var(--mf-border-color);
+}
+
+.mf-pane-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--mf-pane-header-bg);
+  color: var(--mf-pane-header-text);
+  border-bottom: 1px solid var(--mf-border-color);
+  user-select: none;
+}
+
+.mf-pane-content {
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mf-statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  font-size: 10px;
+  border-top: 1px solid var(--mf-border-color);
+  background: var(--mf-statusbar-bg);
+  color: var(--mf-statusbar-text);
+}
+
+.mf-statusbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mf-readonly-badge {
+  color: var(--mf-warning-text);
+  font-weight: 600;
+}
+
+/* ─── Drag overlay ──────────────────────────────────────────────────────────── */
+
+.mf-root.mf-drag-over {
+  outline: 2px dashed var(--mf-accent, #2563eb);
+  outline-offset: -2px;
+}
+
+.mf-drag-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(37, 99, 235, 0.08);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+.mf-drag-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 32px;
+  border-radius: 12px;
+  background: var(--mf-bg-primary, #fff);
+  border: 2px dashed var(--mf-accent, #2563eb);
+  color: var(--mf-accent, #2563eb);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.mf-drag-overlay-icon {
+  font-size: 32px;
+}
+
+/* ─── Upload toast ──────────────────────────────────────────────────────────── */
+
+.mf-upload-toast {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  animation: mf-toast-in 0.2s ease-out;
+  white-space: nowrap;
+}
+
+.mf-upload-toast-uploading {
+  background: var(--mf-bg-primary, #fff);
+  color: var(--mf-accent, #2563eb);
+  border: 1px solid var(--mf-accent, #2563eb);
+}
+
+.mf-upload-toast-error {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+[data-theme="dark"] .mf-upload-toast-error {
+  background: #451a1a;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+.mf-upload-toast-msg {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mf-upload-toast-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.mf-upload-toast-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mf-upload-toast-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .mf-upload-toast-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Spinner animation */
+.mf-upload-spinner {
+  animation: mf-spin 1s linear infinite;
+}
+
+@keyframes mf-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes mf-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

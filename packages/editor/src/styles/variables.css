@@ -1,0 +1,51 @@
+/* ─── MarkFlow Editor — CSS Custom Properties ─────────────────────────────── */
+/* 기본값은 라이트 테마. 커스터마이징은 theme-light.css / theme-dark.css 수정.  */
+
+:root,
+.mf-editor-root {
+  /* ── Layout (theme-independent) ─── */
+  --mf-border-radius: 8px;
+  --mf-toolbar-btn-size: 28px;
+  --mf-line-height: 1.75;
+  --mf-font-body: system-ui, -apple-system, sans-serif;
+  --mf-font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* ── 기본 색상 (라이트 테마 fallback) ─── */
+  --mf-bg-primary: #ffffff;
+  --mf-bg-secondary: #f9fafb;
+  --mf-bg-tertiary: #f3f4f6;
+  --mf-text-primary: #1f2937;
+  --mf-text-secondary: #6b7280;
+  --mf-text-muted: #9ca3af;
+  --mf-border-color: #e5e7eb;
+  --mf-accent: #2563eb;
+  --mf-accent-light: #bfdbfe;
+  --mf-accent-bg: #eff6ff;
+  --mf-btn-active-bg: #dbeafe;
+  --mf-btn-active-border: #60a5fa;
+  --mf-btn-active-text: #1d4ed8;
+  --mf-btn-hover-bg: #f3f4f6;
+  --mf-color-heading: #111827;
+  --mf-color-text: #374151;
+  --mf-color-link: #2563eb;
+  --mf-color-code-bg: #f3f4f6;
+  --mf-color-code-text: #7c3aed;
+  --mf-color-blockquote-border: #e5e7eb;
+  --mf-color-blockquote-text: #6b7280;
+  --mf-color-hr: #e5e7eb;
+  --mf-color-pre-bg: #f8fafc;
+  --mf-color-pre-border: #e2e8f0;
+  --mf-color-table-header-bg: #f3f4f6;
+  --mf-color-table-border: #e5e7eb;
+  --mf-color-table-hover: #f9fafb;
+  --mf-warning-text: #eab308;
+
+  /* ── Derived (reference other variables) ─── */
+  --mf-toolbar-bg: var(--mf-bg-secondary);
+  --mf-toolbar-border: var(--mf-border-color);
+  --mf-pane-header-bg: var(--mf-bg-secondary);
+  --mf-pane-header-text: var(--mf-text-muted);
+  --mf-statusbar-bg: var(--mf-bg-secondary);
+  --mf-statusbar-text: var(--mf-text-muted);
+  --mf-focus-ring: 0 0 0 2px rgba(37, 99, 235, 0.4);
+}

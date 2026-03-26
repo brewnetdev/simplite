@@ -1,0 +1,11 @@
+/* ─── CodeMirror base overrides ───────────────────────────────────────────── */
+
+.cm-editor {
+  height: 100%;
+  outline: none !important;
+}
+
+.cm-scroller {
+  overflow: auto;
+  font-family: var(--mf-font-mono, 'JetBrains Mono', 'Fira Code', 'Consolas', monospace) !important;
+}

@@ -1,0 +1,6 @@
+/* ─── EditorPane styles ───────────────────────────────────────────────────── */
+
+.mf-editor-container {
+  height: 100%;
+  overflow: auto;
+}

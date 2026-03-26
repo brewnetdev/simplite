@@ -1,0 +1,21 @@
+{
+  "name": "markflow",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  },
+  "devDependencies": {
+    "turbo": "^2",
+    "typescript": "^5"
+  }
+}
