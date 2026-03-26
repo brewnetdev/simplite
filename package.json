@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint"
+    "lint": "turbo lint",
+    "test": "turbo test"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -16,6 +17,7 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^20",
     "turbo": "^2",
     "typescript": "^5"
   }

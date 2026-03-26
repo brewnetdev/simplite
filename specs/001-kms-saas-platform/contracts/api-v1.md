@@ -235,7 +235,7 @@
 
 ## Document Versions
 
-### GET /documents/:docId/versions
+### GET /workspaces/:wsId/documents/:docId/versions
 
 **Response 200**: `{ "versions": [{ id, version, createdAt }] }` (최대 20개)
 
@@ -253,7 +253,7 @@
 
 ## Document Relations
 
-### PUT /documents/:docId/relations
+### PUT /workspaces/:wsId/documents/:docId/relations
 
 **Request**:
 ```json
@@ -266,7 +266,7 @@
 **Response 200**: 업데이트된 관계
 **Errors**: 400 CIRCULAR_REFERENCE, 400 TOO_MANY_RELATED_DOCS (21개 이상)
 
-### GET /documents/:docId/relations
+### GET /workspaces/:wsId/documents/:docId/relations
 
 **Response 200**: `{ "prev": {...} | null, "next": {...} | null, "related": [...] }`
 
