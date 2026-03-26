@@ -123,20 +123,33 @@ flowchart TD
     C4 --> C5{인증 링크 클릭?}
     C5 -- 24h 초과 --> C6[재발송 요청] --> C3
     C5 -- 클릭 --> C7[인증 완료]
-    C7 --> W1
+    C7 --> C8[서버: Root 워크스페이스 자동 생성]
+    C8 --> W1
 
     L --> L1[이메일·비밀번호 입력]
     L1 --> L2{인증}
-    L2 -- 실패 5회 --> L3[15분 잠금 안내]
+    L2 -- 실패 5회 → 계정잠금 401 --> L3[15분 잠금 안내]
+    L2 -- IP 초과 → 429 --> L4[잠시 후 재시도 안내]
     L2 -- 성공 --> W1
+    L1 -- 비밀번호 분실 --> PW1
+
+    PW1[비밀번호 찾기 페이지]
+    PW1 --> PW2[이메일 입력]
+    PW2 --> PW3[초기화 링크 발송 POST /auth/forgot-password]
+    PW3 --> PW4[이메일 확인 안내]
+    PW4 --> PW5{링크 클릭?}
+    PW5 -- 만료 --> PW1
+    PW5 -- 클릭 --> PW6[새 비밀번호 입력 POST /auth/reset-password]
+    PW6 --> L
 
     W1[워크스페이스 선택 화면]
     W1 --> W2{워크스페이스 있음?}
-    W2 -- 없음 --> W3[워크스페이스 생성 마법사]
-    W3 --> W4[이름·slug 입력]
-    W4 --> W5[생성 완료]
-    W5 --> D[문서 대시보드]
-    W2 -- 있음 --> D
+    W2 -- Root만 --> D[Root 워크스페이스 문서 대시보드 바로 진입]
+    W2 -- 여러 개 --> W3[워크스페이스 선택]
+    W3 --> D
+    W2 -- 신규 팀 생성 원함 --> W4[워크스페이스 생성 마법사]
+    W4 --> W5[이름·slug 입력]
+    W5 --> D
 ```
 
 ---
@@ -301,5 +314,36 @@ flowchart TD
     G -- 있음 --> H[오류 표시]
     G -- 없음 --> I[다음 페이지 설정]
 
-    D & E & I --> J[미리보기 하단 네비게이션 렌더링]
+    D --> D2{연관 문서 20개 초과?}
+    D2 -- 초과 --> D3[추가 불가 안내]
+    D2 -- 미만 --> J[미리보기 하단 네비게이션 렌더링]
+    E & I --> J
+```
+
+---
+
+### UF-B9. Embed 연동 플로우
+
+```mermaid
+flowchart TD
+    subgraph ADMIN [Admin: Guest Token 발급]
+        A1([워크스페이스 설정 → Embed]) --> A2[토큰 발급 폼]
+        A2 --> A3[라벨·권한·문서 범위·만료일 설정]
+        A3 --> A4[POST /embed-tokens]
+        A4 --> A5[토큰 복사]
+    end
+
+    subgraph DEV [외부 개발자: 연동]
+        B1{연동 방식 선택}
+        B1 -- NPM 패키지 --> B2[npm install @markflow/editor]
+        B2 --> B3[onSave prop에 자체 저장 로직 주입]
+
+        B1 -- iframe --> B4[Guest Token을 src URL에 포함]
+        B4 --> B5[postMessage로 content-changed 수신]
+
+        B1 -- REST API --> B6[Authorization: Bearer token 헤더 추가]
+        B6 --> B7[GET·PATCH /documents API 직접 호출]
+    end
+
+    A5 --> B1
 ```

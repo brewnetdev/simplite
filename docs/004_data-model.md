@@ -47,6 +47,7 @@ erDiagram
         uuid owner_id FK
         text theme_css
         boolean is_public
+        boolean is_root
         timestamp created_at
         timestamp updated_at
     }
@@ -89,8 +90,6 @@ erDiagram
         text title
         text slug
         text content
-        uuid prev_doc_id FK
-        uuid next_doc_id FK
         integer current_version
         boolean is_deleted
         timestamp deleted_at
@@ -132,6 +131,24 @@ erDiagram
         timestamp expires_at
     }
 
+    ACTIVITY_LOGS {
+        uuid id PK
+        uuid workspace_id FK
+        uuid actor_id FK
+        uuid doc_id FK
+        text action
+        jsonb meta
+        timestamp created_at
+    }
+
+    NOTIFICATIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid activity_id FK
+        boolean is_read
+        timestamp created_at
+    }
+
     COMMENTS {
         uuid id PK
         uuid doc_id FK
@@ -158,10 +175,10 @@ erDiagram
     DOCUMENTS ||--o{ DOCUMENT_RELATIONS : "related to"
     DOCUMENTS ||--o{ DOCUMENT_TAGS : "tagged with"
     DOCUMENTS ||--o{ COMMENTS : "has"
-    DOCUMENTS ||--o| DOCUMENTS : "prev"
-    DOCUMENTS ||--o| DOCUMENTS : "next"
     USERS ||--o{ DOCUMENTS : "authors"
     USERS ||--o{ COMMENTS : "writes"
+    USERS ||--o{ ACTIVITY_LOGS : "generates"
+    DOCUMENTS ||--o{ ACTIVITY_LOGS : "logged for"
 ```
 
 ---
@@ -198,6 +215,9 @@ CREATE TABLE workspaces (
     owner_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     theme_css   TEXT        DEFAULT '',
     is_public   BOOLEAN     NOT NULL DEFAULT FALSE,
+    -- M4: Root 워크스페이스 여부. 회원가입 시 자동 생성되는 개인 워크스페이스.
+    -- slug = 'personal-{userId 앞 8자리}', name = 'My Notes', is_root = TRUE
+    is_root     BOOLEAN     NOT NULL DEFAULT FALSE,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -205,6 +225,8 @@ CREATE TABLE workspaces (
 CREATE INDEX idx_workspaces_owner ON workspaces(owner_id);
 CREATE INDEX idx_workspaces_slug  ON workspaces(slug);
 ```
+
+> **Root 워크스페이스 생성 규칙:** 회원가입 완료(이메일 인증 후) 시점에 서버가 자동으로 `is_root = TRUE` 워크스페이스를 1개 생성한다. 사용자는 이 워크스페이스를 삭제할 수 없고, 이름은 변경 가능하다.
 
 ### 2.3 workspace_members
 
@@ -255,8 +277,6 @@ CREATE TABLE documents (
     title            TEXT        NOT NULL DEFAULT 'Untitled',
     slug             TEXT        NOT NULL,
     content          TEXT        NOT NULL DEFAULT '',
-    prev_doc_id      UUID        REFERENCES documents(id) ON DELETE SET NULL,
-    next_doc_id      UUID        REFERENCES documents(id) ON DELETE SET NULL,
     current_version  INTEGER     NOT NULL DEFAULT 1,
     is_deleted       BOOLEAN     NOT NULL DEFAULT FALSE,
     deleted_at       TIMESTAMPTZ,
@@ -265,9 +285,17 @@ CREATE TABLE documents (
     UNIQUE (workspace_id, slug)
 );
 
--- Full-Text Search Index
+-- C2 수정: 한국어 지원을 위해 'english' → 'simple' 형태소 분석기 사용
+-- 한국어는 영어 형태소 분석기로 파싱 불가 → 'simple'(토크나이즈만) + pg_trgm 조합 사용
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Full-Text Search Index (simple: 한국어·영어 공용)
 CREATE INDEX idx_doc_fts ON documents
-    USING gin(to_tsvector('english', coalesce(title,'') || ' ' || coalesce(content,'')));
+    USING gin(to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(content,'')));
+
+-- Trigram Index (부분 일치·한국어 검색 보완)
+CREATE INDEX idx_doc_trgm_title   ON documents USING gin(title   gin_trgm_ops);
+CREATE INDEX idx_doc_trgm_content ON documents USING gin(content gin_trgm_ops);
 
 CREATE INDEX idx_doc_workspace   ON documents(workspace_id);
 CREATE INDEX idx_doc_category    ON documents(category_id);
@@ -305,6 +333,10 @@ CREATE TABLE document_relations (
     created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
     UNIQUE (doc_id, related_doc_id, rel_type)
 );
+
+-- M10: 연관 문서 최대 20개 제한 (rel_type='related' 기준)
+-- 애플리케이션 레이어에서 INSERT 전 COUNT 검사로 적용
+-- 선택적 DB 레이어 보호: 트리거로 추가 가능
 
 CREATE INDEX idx_dr_doc_id   ON document_relations(doc_id);
 CREATE INDEX idx_dr_related  ON document_relations(related_doc_id);
@@ -351,15 +383,55 @@ CREATE INDEX idx_comments_parent ON comments(parent_id);
 
 ---
 
+### 2.10 activity_logs & notifications (M9 — Phase 3 사전 설계)
+
+```sql
+-- 활동 피드: 문서 생성/수정/삭제, 멤버 초대 등 워크스페이스 이벤트 기록
+CREATE TYPE activity_action AS ENUM (
+    'doc_created', 'doc_updated', 'doc_deleted', 'doc_restored',
+    'member_invited', 'member_joined', 'member_removed',
+    'comment_created', 'comment_resolved'
+);
+
+CREATE TABLE activity_logs (
+    id            UUID            PRIMARY KEY DEFAULT gen_random_uuid(),
+    workspace_id  UUID            NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    actor_id      UUID            NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    doc_id        UUID            REFERENCES documents(id) ON DELETE SET NULL,
+    action        activity_action NOT NULL,
+    meta          JSONB           DEFAULT '{}',   -- { title, snippet, role, ... }
+    created_at    TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_activity_ws        ON activity_logs(workspace_id, created_at DESC);
+CREATE INDEX idx_activity_actor     ON activity_logs(actor_id);
+
+-- 알림: 특정 사용자에게 전달되는 읽음/안읽음 항목
+CREATE TABLE notifications (
+    id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id      UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    activity_id  UUID        NOT NULL REFERENCES activity_logs(id) ON DELETE CASCADE,
+    is_read      BOOLEAN     NOT NULL DEFAULT FALSE,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_notif_user ON notifications(user_id, is_read, created_at DESC);
+```
+
+---
+
 ## 3. 데이터 무결성 규칙
 
 | 규칙 | 구현 방법 |
 |------|-----------|
 | 워크스페이스 Owner 최소 1명 | 애플리케이션 레이어 검증 |
-| 문서 Prev/Next 순환 참조 방지 | 저장 전 그래프 순환 탐지 (DFS) |
+| 문서 Prev/Next 순환 참조 방지 | 저장 전 그래프 순환 탐지 (DFS) — DOCUMENT_RELATIONS 단일 소스 |
+| Prev/Next 관계 단일 저장 | DOCUMENT_RELATIONS만 사용, DOCUMENTS 테이블에 중복 컬럼 없음 (C1 해결) |
 | 카테고리 중첩 삭제 시 문서 보호 | `ON DELETE SET NULL` → 문서는 Root로 이동 |
-| 버전 최대 100개 보관 | 저장 시 트리거 또는 앱 레이어 정리 |
+| 버전 최대 보관 (Phase별) | Phase 1: 20개 / Phase 2+: 100개 — 앱 레이어 또는 트리거 정리 |
 | Soft Delete 후 slug 재사용 | 삭제 시 slug에 timestamp 접미사 추가 |
+| Root 워크스페이스 삭제 방지 | `is_root = TRUE` 워크스페이스 DELETE API 403 반환 |
+| 연관 문서 최대 20개 | 애플리케이션 레이어 검증, `rel_type='related'` COUNT > 20 → 400 반환 |
 
 ---
 
@@ -368,13 +440,14 @@ CREATE INDEX idx_comments_parent ON comments(parent_id);
 ```
 migrations/
 ├── 0001_initial_users.sql
-├── 0002_workspaces_members.sql
+├── 0002_workspaces_members.sql        ← is_root 컬럼 포함
 ├── 0003_categories.sql
-├── 0004_documents.sql
-├── 0005_versions_relations.sql
+├── 0004_documents.sql                 ← prev/next 컬럼 제거
+├── 0005_versions_relations.sql        ← relation_type 확장
 ├── 0006_link_previews.sql
 ├── 0007_comments.sql
-└── 0008_search_indexes.sql
+├── 0008_search_indexes.sql            ← pg_trgm + simple FTS
+└── 0009_activity_notifications.sql    ← Phase 3 사전 준비
 ```
 
 - **도구:** Drizzle ORM `drizzle-kit`

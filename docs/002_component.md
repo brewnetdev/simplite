@@ -261,7 +261,14 @@ App (Next.js App Router)
 │
 ├── (auth)/
 │   ├── LoginPage → LoginForm, SocialLoginButtons
-│   └── RegisterPage → RegisterForm
+│   ├── RegisterPage → RegisterForm
+│   └── ForgotPasswordPage → ResetPasswordForm  ← M7: 비밀번호 초기화 UX
+│
+├── embed/
+│   └── doc/[documentId]/     ← M5: iframe embed 전용 라우트
+│       └── EmbedPage
+│           ├── MarkdownEditor (readOnly 또는 편집 모드)
+│           └── EmbedBridge   (postMessage ↔ 부모 창 통신)
 │
 └── (app)/
     ├── WorkspaceSwitcher
@@ -272,7 +279,8 @@ App (Next.js App Router)
         │   │   ├── GlobalSearch (trigger)
         │   │   ├── CategoryTree → CategoryNode, DocumentNode
         │   │   └── UserMenu
-        │   └── MainContent (router outlet)
+        │   ├── MainContent (router outlet)
+        │   └── WorkspaceThemeInjector  ← M6: <style> 동적 주입 컴포넌트
         │
         ├── docs/
         │   └── DocumentListPage → DocumentListToolbar, DocumentList/Grid
@@ -282,8 +290,8 @@ App (Next.js App Router)
                 ├── MarkdownEditor         ← @markflow/editor 패키지
                 ├── DocumentMetaPanel
                 │   ├── LinkManager (RelatedDocsPicker, PrevNextPicker)
-                │   ├── TagInput
-                │   └── VersionHistoryPanel
+                │   ├── TagInput           ← M3: 태그 입력 UI
+                │   └── VersionHistoryPanel (버전 목록 + DiffViewer)  ← M8
                 └── CollaborationLayer (Yjs) → RemoteCursors
 ```
 
@@ -292,9 +300,40 @@ App (Next.js App Router)
 | Store | 주요 상태 |
 |-------|----------|
 | `useAuthStore` | user, accessToken, logout(), refreshToken() |
-| `useWorkspaceStore` | currentWorkspace, members |
+| `useWorkspaceStore` | currentWorkspace, members, themeCss |
 | `useEditorStore` | documentId, saveStatus, queueSave() |
 | `useSidebarStore` | expandedCategoryIds, toggleCategory(), isSidebarOpen |
+
+### 주요 훅 (계획)
+
+```typescript
+// M6: 워크스페이스 테마 CSS 동적 주입 훅
+function useWorkspaceTheme(workspaceId: string, themeCss: string) {
+  useEffect(() => {
+    const id = `mf-ws-theme-${workspaceId}`
+    let el = document.getElementById(id) as HTMLStyleElement | null
+    if (!el) {
+      el = document.createElement('style')
+      el.id = id
+      document.head.appendChild(el)
+    }
+    el.textContent = themeCss
+    return () => { document.getElementById(id)?.remove() }
+  }, [workspaceId, themeCss])
+}
+
+// M5: iframe embed postMessage 브릿지 훅
+function useEmbedBridge(onContentChange: (content: string) => void) {
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data?.type === 'mf:set-content') onContentChange(e.data.content)
+    }
+    window.addEventListener('message', handler)
+    window.parent.postMessage({ type: 'mf:ready' }, '*')
+    return () => window.removeEventListener('message', handler)
+  }, [onContentChange])
+}
+```
 
 ### 데이터 페칭 (TanStack Query — 계획)
 

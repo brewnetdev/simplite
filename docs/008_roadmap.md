@@ -83,12 +83,15 @@ gantt
 ### P0 기능 체크리스트
 
 - [ ] 이메일 회원가입 & 로그인 (JWT)
+- [ ] 회원가입 완료 시 **Root 워크스페이스 자동 생성**
 - [ ] 프로필 편집 (이름, 아바타)
 - [ ] 워크스페이스 생성 & 멤버 초대 (4가지 역할)
+- [ ] 초대 수락 API (`GET /invitations/:token`, `POST /invitations/:token/accept`)
 - [ ] 카테고리(폴더) 트리 (무제한 중첩, 드래그-드롭)
 - [ ] 문서 자동 저장 (1초 디바운스)
-- [ ] 문서 버전 스냅샷 생성
-- [ ] Prev / Next / 연관 링크 설정 UI
+- [ ] 문서 버전 스냅샷 생성 (Phase 1: 최대 20개)
+- [ ] Prev / Next / 연관 링크 설정 UI (DOCUMENT_RELATIONS 단일 저장)
+- [ ] 태그 추가/삭제 (`PUT /documents/:id/tags`)
 - [ ] .md Import / .md Export
 - [ ] 역할 기반 권한 제어 (API + UI)
 
@@ -119,15 +122,18 @@ gantt
 
 ### P1 기능 체크리스트
 
-- [ ] PostgreSQL Full-Text Search (한국어: pg_trgm)
-- [ ] 버전 히스토리 100개 + 버전 간 diff
+- [ ] PostgreSQL Full-Text Search (한국어: pg_trgm + simple FTS)
+- [ ] 버전 히스토리 100개 + 버전 간 diff (fast-diff)
 - [ ] OG 링크 프리뷰 (BullMQ 비동기 처리)
 - [ ] YouTube/Vimeo 임베드
-- [ ] 워크스페이스 CSS 테마 편집기 + 5개 프리셋
+- [ ] 워크스페이스 CSS 테마 편집기 + 5개 프리셋 + 동적 `<style>` 주입
 - [ ] 실시간 공동편집 (Yjs + y-websocket)
 - [ ] 인라인 댓글 (스레드형)
 - [ ] Google / GitHub OAuth
 - [ ] ZIP Import/Export
+- [ ] HTML Export (인라인 CSS) / HTML Import (Turndown 변환)
+- [ ] PDF Export (서버사이드 Puppeteer)
+- [ ] Embed 연동: Guest Token 발급 API + iframe embed 페이지
 - [ ] Mermaid 다이어그램
 - [ ] 위키링크 (`[[문서 제목]]`)
 
@@ -150,8 +156,10 @@ gantt
 | 기능 | 분기 |
 |------|------|
 | 태그 시스템 + 그래프 뷰 | Q3 2026 |
-| 활동 피드 & 이메일 알림 | Q3 2026 |
+| 활동 피드 & 이메일 알림 (ACTIVITY_LOGS 기반) | Q3 2026 |
 | 공개 페이지 게시 (커스텀 도메인) | Q3 2026 |
+| PDF Import (pdfjs-dist 텍스트 추출, 베스트 에포트) | Q3 2026 |
+| Embed NPM 패키지 고급 옵션 (onSave, onLoad 커스텀 훅) | Q3 2026 |
 | AI 글쓰기 보조 (Claude API) | Q4 2026 |
 | 모바일 반응형 최적화 | Q4 2026 |
 | SSO / SAML | Q4 2026 |
@@ -161,9 +169,11 @@ gantt
 
 | 플랜 | 가격 | 워크스페이스 | 멤버 | 저장공간 |
 |------|------|------------|------|---------|
-| Free | $0 | 1개 | 5명 | 1GB |
+| Free | $0 | 1개 (Root 워크스페이스 자동 생성 포함) | 5명 | 1GB |
 | Team | $12/월/멤버 | 무제한 | 무제한 | 50GB |
 | Enterprise | 문의 | 무제한 | 무제한 | 무제한 + SSO |
+
+> **C4 수정:** 001 요구사항의 "사용자당 최대 10개" 규칙은 플랜 정책으로 대체됨. Free 플랜 = 1개, Team 이상 = 무제한.
 
 ---
 

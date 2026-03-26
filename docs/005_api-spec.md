@@ -37,6 +37,15 @@
 **Response** `200` `{ "accessToken": "...", "user": { id, email, name, avatarUrl } }`
 > Refresh Token → `Set-Cookie: refreshToken=...; HttpOnly; Secure; SameSite=Strict`
 
+**실패 케이스 (C3 명확화)**
+
+| 상황 | HTTP | code |
+|------|------|------|
+| 이메일/비밀번호 불일치 | `401` | `INVALID_CREDENTIALS` |
+| 동일 계정 5회 연속 실패 → 15분 계정 잠금 | `401` | `ACCOUNT_LOCKED` + `lockedUntil: ISO8601` |
+| IP 기준 10회/15분 초과 | `429` | `RATE_LIMITED` |
+| 이메일 미인증 | `403` | `EMAIL_NOT_VERIFIED` |
+
 ### POST /auth/refresh
 Cookie의 refreshToken으로 Access Token 갱신
 **Response** `200` `{ "accessToken": "..." }`
@@ -109,6 +118,16 @@ Cookie의 refreshToken으로 Access Token 갱신
 **Request** `{ "email": "...", "role": "editor" }`
 **Response** `201` `{ invitationId, expiresAt }`
 
+### GET /invitations/:token
+초대 토큰 유효성 확인 (공개 엔드포인트, 인증 불필요)
+**Response** `200` `{ workspaceName, inviterName, role, expiresAt }`
+**Error** `404` `{ "code": "INVITATION_NOT_FOUND" }` · `410` `{ "code": "INVITATION_EXPIRED" }`
+
+### POST /invitations/:token/accept
+초대 수락 — 로그인 또는 회원가입 후 호출 (인증 필요)
+**Response** `200` `{ workspaceId, workspaceSlug, role }`
+**Error** `409` `{ "code": "ALREADY_MEMBER" }` · `410` `{ "code": "INVITATION_EXPIRED" }`
+
 ### PATCH /workspaces/:workspaceId/members/:userId `[Admin+]`
 **Request** `{ "role": "viewer" }`
 
@@ -173,6 +192,40 @@ Soft Delete
 
 ### PATCH /workspaces/:workspaceId/documents/:documentId/links `[Editor+]`
 **Request** `{ "prevDocId": "uuid|null", "nextDocId": "uuid|null", "relatedDocIds": ["uuid1"] }`
+> 연관 문서(`relatedDocIds`) 최대 20개 초과 시 `400 { code: "TOO_MANY_RELATED_DOCS" }` 반환
+
+### GET /workspaces/:workspaceId/documents/:documentId/tags
+**Response** `200` `{ tags: ["string"] }`
+
+### PUT /workspaces/:workspaceId/documents/:documentId/tags `[Editor+]`
+태그 목록 전체 교체 (upsert)
+**Request** `{ "tags": ["tag1", "tag2"] }` — 최대 30개, 태그당 최대 50자
+**Response** `200` `{ tags: ["tag1", "tag2"] }`
+
+### GET /workspaces/:workspaceId/tags
+워크스페이스 내 사용 중인 태그 목록 (검색 필터 자동완성용)
+**Response** `200` `{ tags: [{ name, count }] }`
+
+---
+
+## 10. 버전 Diff `P1`
+
+### GET /workspaces/:workspaceId/documents/:documentId/versions/diff
+두 버전 간 차이 반환
+**Query:** `from` (versionNum), `to` (versionNum)
+**Response** `200`
+```json
+{
+  "fromVersion": 3,
+  "toVersion": 5,
+  "diff": [
+    { "type": "equal",   "value": "# Title\n" },
+    { "type": "delete",  "value": "Old paragraph.\n" },
+    { "type": "insert",  "value": "New paragraph.\n" }
+  ]
+}
+```
+> 서버사이드 Myers diff 알고리즘 적용 (fast-diff 라이브러리)
 
 ---
 
@@ -196,38 +249,96 @@ Soft Delete
 ## 8. Import / Export
 
 ### POST /workspaces/:workspaceId/import `[Editor+]`
-`multipart/form-data` · `file`: .md 또는 .zip · `categoryId` · `conflictStrategy`: overwrite|create_new
+`multipart/form-data` · `file`: `.md`, `.zip`, `.html` · `categoryId` · `conflictStrategy`: overwrite|create_new
 **Response** `202` `{ jobId, statusUrl }`
 
+| 파일 형식 | 처리 방법 |
+|-----------|-----------|
+| `.md` | 직접 파싱 후 문서 생성 |
+| `.zip` | 압축 해제 후 폴더 구조 유지하며 일괄 생성 |
+| `.html` | 서버사이드 Turndown(HTML→MD) 변환 후 저장 |
+| `.pdf` | pdfjs-dist 텍스트 추출 → Markdown 변환 (P2, 베스트 에포트) |
+
 ### GET /workspaces/:workspaceId/export `[Editor+]`
-**Query:** `documentId`, `categoryId`, `format` (md|zip)
-단일 문서 → `200` + `text/markdown` / 카테고리 → `202` + 비동기 링크
+**Query:** `documentId`, `categoryId`, `format` (md|zip|html|pdf)
+
+| format | 처리 방법 | 응답 |
+|--------|-----------|------|
+| `md` | 단일 문서 | `200` + `text/markdown` |
+| `html` | 렌더링된 HTML (인라인 CSS + 워크스페이스 테마 적용) | `200` + `text/html` |
+| `pdf` | 서버사이드 Puppeteer PDF 생성 (워크스페이스 테마 CSS 적용) | `202` + 비동기 링크 |
+| `zip` | 카테고리 전체 — md 묶음 | `202` + 비동기 링크 |
 
 ---
 
 ## 9. 댓글 (Comments) `P1`
 
-### GET /documents/:documentId/comments
+> **C5 수정:** 모든 댓글 API는 workspace 범위 강제 (RLS 원칙 준수)
+
+### GET /workspaces/:workspaceId/documents/:documentId/comments
 스레드 구조 (replies 중첩)
 
-### POST /documents/:documentId/comments `[Viewer+]`
+### POST /workspaces/:workspaceId/documents/:documentId/comments `[Viewer+]`
 **Request** `{ "selection": { from, to, text }, "content": "..." }`
 
-### PATCH /documents/:documentId/comments/:commentId `[본인/Admin+]`
+### PATCH /workspaces/:workspaceId/documents/:documentId/comments/:commentId `[본인/Admin+]`
 **Request** `{ "content": "...", "resolved": true }`
 
-### DELETE /documents/:documentId/comments/:commentId `[본인/Admin+]`
+### DELETE /workspaces/:workspaceId/documents/:documentId/comments/:commentId `[본인/Admin+]`
 **Response** `204`
 
 ---
 
-## 10. Rate Limiting
+## 11. Rate Limiting
 
-| 엔드포인트 | 제한 | 윈도우 |
-|-----------|------|--------|
-| POST /auth/login | 10 req | 15분/IP |
-| POST /auth/register | 5 req | 1시간/IP |
-| POST /link-preview | 30 req | 1분/User |
-| PATCH /documents (자동저장) | 60 req | 1분/User |
-| GET /search | 30 req | 1분/User |
-| 기타 | 300 req | 1분/User |
+| 엔드포인트 | 제한 | 윈도우 | 비고 |
+|-----------|------|--------|------|
+| POST /auth/login | 10 req | 15분/IP | IP 기준 Rate Limit (C3: 계정 잠금과 별개) |
+| POST /auth/register | 5 req | 1시간/IP | — |
+| POST /link-preview | 30 req | 1분/User | — |
+| PATCH /documents (자동저장) | 60 req | 1분/User | — |
+| GET /search | 30 req | 1분/User | — |
+| GET /versions/diff | 20 req | 1분/User | diff 연산 비용 고려 |
+| POST /import | 5 req | 1분/User | 파일 처리 비용 고려 |
+| 기타 | 300 req | 1분/User | — |
+
+---
+
+## 12. Embed 연동 API `P1`
+
+> M5 추가: 외부 프로젝트에서 KMS 문서를 embed할 수 있는 Guest Token 발급 방식
+
+### POST /workspaces/:workspaceId/embed-tokens `[Admin+]`
+Guest Token 발급 — 외부 앱·iframe이 KMS에 접근할 때 사용하는 단기 토큰
+**Request**
+```json
+{
+  "label": "My Blog CMS",
+  "scope": "read" | "read_write",
+  "allowedDocIds": ["uuid1"],        // 특정 문서만 허용 (null = 워크스페이스 전체)
+  "expiresAt": "2027-01-01T00:00:00Z" // null = 영구 (취소 전까지)
+}
+```
+**Response** `201` `{ tokenId, token, label, scope, expiresAt }`
+
+### GET /workspaces/:workspaceId/embed-tokens `[Admin+]`
+발급된 토큰 목록 조회
+**Response** `200` `{ tokens: [{ tokenId, label, scope, createdAt, expiresAt, lastUsedAt }] }`
+
+### DELETE /workspaces/:workspaceId/embed-tokens/:tokenId `[Admin+]`
+토큰 즉시 폐기
+**Response** `204`
+
+### GET /embed/doc/:documentId `[Guest Token]`
+iframe embed용 문서 뷰어 HTML 페이지 반환
+**Query:** `token` (Guest Token), `readOnly` (true|false), `theme` (light|dark), `hideToolbar` (true|false)
+**Response** `200` + `text/html` — 에디터 또는 Preview 전용 페이지
+
+> **인증 방법:** Guest Token은 `Authorization: Bearer <token>` 또는 쿼리 파라미터 `?token=...` 양쪽 허용  
+> **postMessage 이벤트:** iframe ↔ 부모 창 통신 프로토콜
+> ```
+> 부모 → iframe: { type: "mf:set-content", content: "# Hello" }
+> iframe → 부모: { type: "mf:content-changed", content: "..." }
+> iframe → 부모: { type: "mf:saved", documentId: "...", version: 5 }
+> iframe → 부모: { type: "mf:ready" }
+> ```

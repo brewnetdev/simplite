@@ -132,7 +132,11 @@ describe('POST /api/v1/auth/register', () => {
 
 describe('POST /api/v1/auth/login', () => {
   it('올바른 자격증명으로 accessToken + refreshToken 쿠키 반환')
-  it('5회 실패 후 429 반환')
+  // C3 수정: 계정 잠금(401)과 Rate Limit(429)는 별개 메커니즘
+  it('동일 계정 5회 실패 후 401 + ACCOUNT_LOCKED 코드 반환')
+  it('ACCOUNT_LOCKED 응답에 lockedUntil(ISO8601) 필드 포함')
+  it('IP 기준 10회/15분 초과 후 429 + RATE_LIMITED 반환')
+  it('이메일 미인증 계정 로그인 시 403 + EMAIL_NOT_VERIFIED 반환')
 })
 ```
 
@@ -144,6 +148,17 @@ describe('Documents API', () => {
   it('Viewer 멤버는 403 반환')
   it('저장 시 새 버전이 생성된다')
   it('삭제 후 목록에서 제외되고 휴지통에서 조회된다')
+  // M3: 태그
+  it('태그 PUT으로 문서 태그 전체 교체된다')
+  it('태그 31개 이상 PUT 시 400 반환')
+  // M8: 버전 diff
+  it('버전 diff API가 from/to 버전 사이 변경 내용을 반환한다')
+  it('존재하지 않는 버전 번호로 diff 요청 시 404 반환')
+  // M10: 연관 문서 제한
+  it('연관 문서 21개 추가 시도 시 400 + TOO_MANY_RELATED_DOCS 반환')
+  // M1: Export
+  it('html format export 시 200 + text/html 반환')
+  it('pdf format export 시 202 + jobId 반환')
 })
 ```
 
@@ -163,6 +178,20 @@ describe('Role-based access control', () => {
   ] as const
 
   test.each(scenarios)('%s 역할의 %s 액션은 %d 반환', ...)
+})
+
+describe('Embed Token API', () => {
+  it('Admin 이상만 Guest Token을 발급할 수 있다')
+  it('Editor 역할은 토큰 발급 시 403 반환')
+  it('만료된 Guest Token으로 embed API 접근 시 401 반환')
+  it('폐기된 토큰으로 접근 시 401 반환')
+})
+
+describe('Invitation API', () => {
+  it('유효한 토큰으로 GET /invitations/:token 조회 시 200 반환')
+  it('만료된 토큰 조회 시 410 반환')
+  it('POST /invitations/:token/accept 성공 시 workspace에 멤버 추가됨')
+  it('이미 멤버인 사용자가 수락 시 409 + ALREADY_MEMBER 반환')
 })
 ```
 

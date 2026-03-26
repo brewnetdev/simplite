@@ -76,6 +76,10 @@ markflow/                        (Turborepo monorepo)
 │  │  Docs    │ │  Users   │ │  Search  │ │  OG Preview   │  │
 │  │  API     │ │  API     │ │  API     │ │  Proxy API    │  │
 │  └──────────┘ └──────────┘ └──────────┘ └───────────────┘  │
+│  ┌──────────────────┐  ┌────────────┐  ┌─────────────────┐  │
+│  │  Embed Token API │  │ Export API │  │ BullMQ Job Queue│  │
+│  │  /embed-tokens   │  │ PDF·HTML   │  │ PDF·ZIP 비동기  │  │
+│  └──────────────────┘  └────────────┘  └─────────────────┘  │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │         y-websocket (Collaboration Server)            │   │
 │  └──────────────────────────────────────────────────────┘   │
@@ -108,6 +112,9 @@ markflow/                        (Turborepo monorepo)
 | 상태관리 (FE) | Zustand 4+ | 경량, hooks 친화 |
 | HTTP 클라이언트 (FE) | TanStack Query 5+ | 캐싱, 낙관적 업데이트 |
 | 스타일링 (FE) | Tailwind CSS 4+ | 유틸리티 퍼스트 |
+| PDF 생성 | Puppeteer (서버사이드) | 워크스페이스 CSS 테마 반영 |
+| HTML→MD 변환 | Turndown (서버사이드) | HTML Import 처리 |
+| 버전 Diff | fast-diff (Myers 알고리즘) | 경량, 순수 JS |
 
 ### 인프라
 
@@ -131,6 +138,127 @@ markflow/                        (Turborepo monorepo)
 - **데이터 격리:** 모든 쿼리에 `workspace_id` 범위 강제 (RLS)
 - **Rate Limit:** IP + User 기준 요청 제한
 - **Secrets:** 환경 변수 관리, 하드코딩 금지
+
+## 4. Embed 연동 아키텍처 (M5 — 📋 계획됨)
+
+> 원 요구사항: "어떤 프로젝트에도 embed될 수 있도록 독립 구동 환경, 연동 방식에 대한 해법 제시"
+
+### 4.1 연동 방식 3종
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    외부 프로젝트 (External App)                │
+│                                                              │
+│  ① NPM 패키지          ② iframe embed         ③ REST API    │
+│  ─────────────         ─────────────────       ───────────  │
+│  npm install           <iframe src=            fetch(        │
+│  @markflow/editor       "/embed/doc/:id         "/api/v1/    │
+│                          ?token=GUEST">          docs/:id",  │
+│  onSave prop 주입       postMessage             { headers:   │
+│  (자체 저장 로직)        이벤트 통신              Bearer token})│
+└──────┬─────────────────────────┬──────────────────┬─────────┘
+       │ (독립 동작)              │ Guest Token      │ Guest Token
+       │                         ▼                  ▼
+       │              ┌──────────────────────────────────────┐
+       │              │         MarkFlow KMS API             │
+       │              │  /embed/doc/:id · /api/v1/documents  │
+       └──────────────└──────────────────────────────────────┘
+```
+
+### 4.2 방식별 특성 비교
+
+| 항목 | ① NPM 패키지 | ② iframe | ③ REST API |
+|------|-------------|---------|-----------|
+| KMS 백엔드 필요 | 선택사항 | 필수 | 필수 |
+| 인증 방식 | 없음 (standalone) | Guest Token (URL param) | Guest Token (Bearer header) |
+| 커스터마이징 | 완전 자유 (React props) | query param 제한 | 완전 자유 |
+| 구현 난이도 (외부 개발자) | 낮음 | 매우 낮음 | 중간 |
+| 보안 격리 | 완전 통합 (호스트 앱과 동일 origin) | iframe sandbox | 토큰 권한 범위 |
+| 적합한 use case | React/Next.js 앱 | 어떤 환경이든 | 헤드리스 CMS |
+
+### 4.3 Guest Token 흐름
+
+```
+Admin (KMS)                   외부 앱 서버              외부 앱 브라우저
+    │                              │                          │
+    │ POST /embed-tokens           │                          │
+    │ { scope, expiresAt, ... }    │                          │
+    │──────────────────────────────┤                          │
+    │ ← { token: "mf_gt_..." }     │                          │
+    │                              │                          │
+    │                              │ GET /embed/doc/:id       │
+    │                              │ ?token=mf_gt_...         │
+    │                              │──────────────────────────│
+    │                              │ ← HTML (에디터 페이지)    │
+```
+
+### 4.4 iframe postMessage 프로토콜
+
+```typescript
+// 부모 → iframe
+iframe.contentWindow.postMessage({ type: 'mf:set-content', content: '# Hello' }, origin)
+
+// iframe → 부모
+window.parent.postMessage({ type: 'mf:ready' }, '*')
+window.parent.postMessage({ type: 'mf:content-changed', content: '...' }, '*')
+window.parent.postMessage({ type: 'mf:saved', documentId: '...', version: 5 }, '*')
+```
+
+---
+
+## 4b. CSS 테마 로딩 메커니즘 (M6 — 📋 계획됨)
+
+> 원 요구사항: "CSS import로 변경된 CSS가 워크스페이스 단위로 적용"
+
+### 적용 방식: 동적 `<style>` 주입
+
+```typescript
+// 워크스페이스 진입 시 실행 (apps/kms/src/hooks/useWorkspaceTheme.ts)
+function applyWorkspaceTheme(themeCss: string, workspaceId: string) {
+  const styleId = `mf-ws-theme-${workspaceId}`
+  let el = document.getElementById(styleId) as HTMLStyleElement | null
+
+  if (!el) {
+    el = document.createElement('style')
+    el.id = styleId
+    document.head.appendChild(el)
+  }
+  el.textContent = themeCss   // DB에서 받아온 CSS 텍스트 그대로 주입
+}
+
+// 워크스페이스 이탈 시 정리
+function removeWorkspaceTheme(workspaceId: string) {
+  document.getElementById(`mf-ws-theme-${workspaceId}`)?.remove()
+}
+```
+
+### CSS 범위 격리 전략
+
+| 방식 | 적용 범위 | 보안 | 권장 상황 |
+|------|-----------|------|-----------|
+| `<style>` 동적 주입 | 전체 페이지 | 낮음 (악성 CSS 가능) | 내부 팀 워크스페이스 |
+| CSS 변수 오버라이드만 허용 | Preview 패널 | 높음 | 외부 공개 워크스페이스 |
+| Shadow DOM iframe | 완전 격리 | 매우 높음 | 공개 embed 페이지 |
+
+> **Phase 1 구현:** CSS 변수(`--mf-*`) 오버라이드만 허용하는 화이트리스트 방식으로 시작.  
+> **Phase 2+:** Admin 이상은 전체 CSS 편집 허용 + 서버사이드 CSS linting으로 악성 코드 차단.
+
+### CSS 변수 네임스페이스 (Preview 패널 적용 범위)
+
+```css
+/* 워크스페이스 테마 CSS가 오버라이드할 수 있는 변수 목록 */
+.mf-preview-content {
+  --mf-font-body:        'Pretendard', sans-serif;
+  --mf-font-code:        'JetBrains Mono', monospace;
+  --mf-color-heading:    #1a1a1a;
+  --mf-color-body:       #374151;
+  --mf-color-link:       #2563EB;
+  --mf-color-code-bg:    #f3f4f6;
+  --mf-color-blockquote: #6b7280;
+  --mf-line-height:      1.75;
+  --mf-max-width:        720px;
+}
+```
 
 ---
 

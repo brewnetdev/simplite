@@ -203,7 +203,8 @@ markdown (string)
 
 **주요 인수 조건**
 - [ ] 비밀번호: 8자 이상, 영문+숫자+특수문자
-- [ ] 5회 연속 로그인 실패 시 15분 계정 잠금
+- [ ] 동일 계정 5회 연속 로그인 실패 시 15분 **계정 잠금** → `401 + { code: "ACCOUNT_LOCKED" }` 반환
+- [ ] IP 기준 10회/15분 초과 시 **Rate Limit** → `429 + { code: "RATE_LIMITED" }` 반환 (계정 잠금과 별개 동작)
 - [ ] Remember me 선택 시 Refresh Token 30일
 
 ---
@@ -212,10 +213,10 @@ markdown (string)
 
 | 기능 | 우선순위 | 설명 |
 |------|---------|------|
-| 워크스페이스 생성 | P0 | slug 기반 URL, 사용자당 최대 10개 |
+| 워크스페이스 생성 | P0 | slug 기반 URL. 플랜별 제한: Free=1개(Root 포함), Team=무제한 |
 | 멤버 초대 | P0 | 이메일 초대, 72시간 유효 |
 | 역할 관리 | P0 | Owner / Admin / Editor / Viewer |
-| 워크스페이스 설정 | P1 | 공개 읽기, 삭제 (이름 확인 필수) |
+| 워크스페이스 설정 | P1 | 공개 읽기, 삭제 (이름 확인 필수, Root 워크스페이스 삭제 불가) |
 
 **역할 권한 매트릭스**
 
@@ -235,7 +236,7 @@ markdown (string)
 | 문서 생성 | P0 | 빈 문서/템플릿, H1 기반 제목 자동 동기화, slug 자동 생성 |
 | 문서 목록/탐색 | P0 | 리스트/그리드 뷰, 정렬(이름/수정일/생성일), 필터 |
 | 자동 저장 | P0 | 1초 디바운스, 상태 표시 (저장 중/저장됨/변경사항) |
-| 버전 히스토리 | P1 | 100버전 보관, diff 표시, 복원 |
+| 버전 히스토리 | P1 | Phase 1: 최대 20개 보관 / Phase 2+: 최대 100개 + diff 표시 + 복원 |
 | 문서 삭제 | P0 | Soft Delete → 30일 후 영구 삭제 |
 
 ---
@@ -293,7 +294,31 @@ markdown (string)
 
 ---
 
-### B10. Import / Export
+### B11. Root 워크스페이스 `P0` 📋
+
+- [ ] 회원가입(이메일 인증) 완료 시 서버가 **Root 워크스페이스 1개를 자동 생성** (이름: "My Notes", slug: `personal-{uid8}`)
+- [ ] Root 워크스페이스는 삭제 불가 (Owner 본인만 소속)
+- [ ] 이름 변경 가능, CSS 테마 적용 가능
+- [ ] 문서 생성 시 워크스페이스 미지정 → Root 워크스페이스에 자동 귀속
+
+---
+
+### B12. Embed 연동 `P1` 📋
+
+> 원 요구사항: "어떤 프로젝트에도 embed될 수 있도록 독립 구동 환경, 연동 방식에 대한 고민이 깊어야 한다"
+
+**3가지 연동 방식 지원**
+
+| 방식 | 대상 | 설명 |
+|------|------|------|
+| **① NPM 패키지 (Standalone)** | React/Next.js 앱 | `@markflow/editor` npm install. KMS 백엔드 없이 에디터만 독립 동작. `onSave` prop으로 저장 로직 주입 |
+| **② Guest Token (API Key 방식)** | 서드파티 SaaS | 워크스페이스 Admin이 Guest Token 발급 → 외부 앱이 API 헤더에 포함 → 문서 읽기/쓰기 가능. 권한 범위(scope) 설정 가능 |
+| **③ iframe + postMessage** | 어떤 환경이든 | `<iframe src="https://app.markflow.io/embed/doc/:id?token=..." />`. 저장/로드 이벤트를 `postMessage`로 부모 창과 통신 |
+
+**인수 조건**
+- [ ] Guest Token: 만료일 설정, 읽기 전용/읽기-쓰기 scope 선택
+- [ ] iframe 모드: `?readOnly=true`, `?theme=dark`, `?hideToolbar=true` 쿼리 파라미터 지원
+- [ ] NPM 패키지: KMS 연결 없이도 동작 (localStorage 저장 폴백)
 
 | 기능 | 우선순위 | 설명 |
 |------|---------|------|
@@ -301,3 +326,7 @@ markdown (string)
 | .zip Import | P0 | 폴더 구조 유지 |
 | .md Export | P0 | 현재 문서 다운로드 |
 | .zip Export | P0 | 카테고리 전체 폴더 구조 보존 |
+| HTML Export | P1 | 현재 문서를 렌더링된 `.html`로 다운로드 (인라인 CSS 포함) |
+| HTML Import | P1 | `.html` 파일을 Turndown으로 Markdown 변환 후 저장 |
+| PDF Export | P1 | 서버사이드 Puppeteer 기반 PDF 생성 (워크스페이스 테마 CSS 적용) |
+| PDF Import | P2 | PDF 텍스트 추출 후 Markdown 변환 (이미지/표 제한적 지원, 베스트 에포트) |
