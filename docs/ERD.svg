@@ -1,0 +1,378 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1050" width="1400" height="1050" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <style>
+      .table-header { fill: #1A56DB; }
+      .table-header-text { fill: #FFFFFF; font-size: 13px; font-weight: bold; }
+      .table-body { fill: #FFFFFF; stroke: #CBD5E1; stroke-width: 1; }
+      .col-text { fill: #1A1916; font-size: 10.5px; }
+      .col-type { fill: #6B7280; font-size: 10px; }
+      .col-constraint { fill: #1A56DB; font-size: 9px; font-weight: bold; }
+      .relation-line { stroke: #94A3B8; stroke-width: 1.5; fill: none; }
+      .relation-label { fill: #6B7280; font-size: 9px; }
+      .title-text { fill: #1A1916; font-size: 20px; font-weight: bold; }
+      .subtitle-text { fill: #6B7280; font-size: 12px; }
+      .legend-text { fill: #1A1916; font-size: 10px; }
+      .crow-foot { stroke: #94A3B8; stroke-width: 1.5; fill: none; }
+      .one-mark { stroke: #94A3B8; stroke-width: 1.5; }
+    </style>
+    <!-- Crow's foot marker (many) -->
+    <marker id="crow-many" viewBox="0 0 12 12" refX="12" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 12,6 L 0,0 M 12,6 L 0,12 M 12,6 L 0,6" class="crow-foot"/>
+    </marker>
+    <!-- One marker -->
+    <marker id="one" viewBox="0 0 12 12" refX="0" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <line x1="2" y1="0" x2="2" y2="12" class="one-mark"/>
+      <line x1="6" y1="0" x2="6" y2="12" class="one-mark"/>
+    </marker>
+    <!-- Single one marker -->
+    <marker id="one-single" viewBox="0 0 12 12" refX="0" refY="6" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <line x1="3" y1="0" x2="3" y2="12" class="one-mark"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="1050" fill="#F8FAFC"/>
+
+  <!-- Title -->
+  <text x="700" y="32" text-anchor="middle" class="title-text">KMS SaaS Platform - Entity Relationship Diagram</text>
+  <text x="700" y="50" text-anchor="middle" class="subtitle-text">13 Tables | PostgreSQL 16 | Drizzle ORM Schema</text>
+
+  <!-- Legend -->
+  <rect x="20" y="14" width="180" height="42" rx="4" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="30" y="30" class="legend-text" font-weight="bold">Legend:</text>
+  <text x="30" y="44" class="col-constraint">PK</text><text x="48" y="44" class="legend-text">Primary Key</text>
+  <text x="108" y="30" class="col-constraint">FK</text><text x="126" y="30" class="legend-text">Foreign Key</text>
+  <text x="108" y="44" class="col-constraint">UQ</text><text x="126" y="44" class="legend-text">Unique</text>
+
+  <!-- ==================== -->
+  <!-- TABLE: users (center-top) -->
+  <!-- ==================== -->
+  <g transform="translate(540, 70)">
+    <rect x="0" y="0" width="200" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="200" height="196" rx="0" class="table-body"/>
+    <rect x="0" y="196" width="200" height="20" rx="0" ry="0" class="table-body" style="stroke-width:0"/>
+    <rect x="0" y="204" width="200" height="12" rx="0" ry="4" class="table-body"/>
+    <text x="100" y="15" text-anchor="middle" class="table-header-text">users</text>
+    <!-- Columns -->
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="194" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">UQ</text><text x="26" y="54" class="col-text">email</text><text x="194" y="54" text-anchor="end" class="col-type">varchar(255) NN</text>
+    <text x="26" y="70" class="col-text">password_hash</text><text x="194" y="70" text-anchor="end" class="col-type">varchar(255) NN</text>
+    <text x="26" y="86" class="col-text">name</text><text x="194" y="86" text-anchor="end" class="col-type">varchar(100) NN</text>
+    <text x="26" y="102" class="col-text">avatar_url</text><text x="194" y="102" text-anchor="end" class="col-type">varchar(500)</text>
+    <text x="26" y="118" class="col-text">email_verified</text><text x="194" y="118" text-anchor="end" class="col-type">boolean NN</text>
+    <text x="26" y="134" class="col-text">email_verify_token</text><text x="194" y="134" text-anchor="end" class="col-type">varchar(255)</text>
+    <text x="26" y="150" class="col-text">email_verify_expires_at</text><text x="194" y="150" text-anchor="end" class="col-type">timestamptz</text>
+    <text x="26" y="166" class="col-text">locked_until</text><text x="194" y="166" text-anchor="end" class="col-type">timestamptz</text>
+    <text x="26" y="182" class="col-text">login_fail_count</text><text x="194" y="182" text-anchor="end" class="col-type">integer NN</text>
+    <text x="26" y="198" class="col-text">created_at</text><text x="194" y="198" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="214" class="col-text">updated_at</text><text x="194" y="214" text-anchor="end" class="col-type">timestamptz NN</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: workspaces (center) -->
+  <!-- ==================== -->
+  <g transform="translate(540, 320)">
+    <rect x="0" y="0" width="200" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="200" height="148" rx="0" class="table-body"/>
+    <rect x="0" y="156" width="200" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="100" y="15" text-anchor="middle" class="table-header-text">workspaces</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="194" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="26" y="54" class="col-text">name</text><text x="194" y="54" text-anchor="end" class="col-type">varchar(100) NN</text>
+    <text x="6" y="70" class="col-constraint">UQ</text><text x="26" y="70" class="col-text">slug</text><text x="194" y="70" text-anchor="end" class="col-type">varchar(100) NN</text>
+    <text x="26" y="86" class="col-text">is_root</text><text x="194" y="86" text-anchor="end" class="col-type">boolean NN</text>
+    <text x="26" y="102" class="col-text">is_public</text><text x="194" y="102" text-anchor="end" class="col-type">boolean NN</text>
+    <text x="6" y="118" class="col-constraint">FK</text><text x="26" y="118" class="col-text">owner_id</text><text x="194" y="118" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="134" class="col-text">created_at</text><text x="194" y="134" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="150" class="col-text">updated_at</text><text x="194" y="150" text-anchor="end" class="col-type">timestamptz NN</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: workspace_members (right) -->
+  <!-- ==================== -->
+  <g transform="translate(830, 130)">
+    <rect x="0" y="0" width="210" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="210" height="100" rx="0" class="table-body"/>
+    <rect x="0" y="108" width="210" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="105" y="15" text-anchor="middle" class="table-header-text">workspace_members</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="204" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="204" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">FK</text><text x="26" y="70" class="col-text">user_id</text><text x="204" y="70" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="86" class="col-text">role</text><text x="204" y="86" text-anchor="end" class="col-type">varchar(20) NN</text>
+    <text x="26" y="102" class="col-text">joined_at</text><text x="204" y="102" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="6" y="118" class="col-constraint">UQ</text><text x="30" y="118" class="col-type">(workspace_id, user_id)</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: invitations (right) -->
+  <!-- ==================== -->
+  <g transform="translate(1100, 70)">
+    <rect x="0" y="0" width="210" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="210" height="148" rx="0" class="table-body"/>
+    <rect x="0" y="156" width="210" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="105" y="15" text-anchor="middle" class="table-header-text">invitations</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="204" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="204" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">FK</text><text x="26" y="70" class="col-text">inviter_id</text><text x="204" y="70" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="86" class="col-text">email</text><text x="204" y="86" text-anchor="end" class="col-type">varchar(255) NN</text>
+    <text x="26" y="102" class="col-text">role</text><text x="204" y="102" text-anchor="end" class="col-type">varchar(20) NN</text>
+    <text x="6" y="118" class="col-constraint">UQ</text><text x="26" y="118" class="col-text">token</text><text x="204" y="118" text-anchor="end" class="col-type">varchar(255) NN</text>
+    <text x="26" y="134" class="col-text">status</text><text x="204" y="134" text-anchor="end" class="col-type">varchar(20) NN</text>
+    <text x="26" y="150" class="col-text">expires_at</text><text x="204" y="150" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="166" class="col-text">created_at</text><text x="204" y="166" text-anchor="end" class="col-type">timestamptz NN</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: join_requests (right-bottom) -->
+  <!-- ==================== -->
+  <g transform="translate(1100, 290)">
+    <rect x="0" y="0" width="210" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="210" height="148" rx="0" class="table-body"/>
+    <rect x="0" y="156" width="210" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="105" y="15" text-anchor="middle" class="table-header-text">join_requests</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="204" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="204" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">FK</text><text x="26" y="70" class="col-text">user_id</text><text x="204" y="70" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="86" class="col-text">message</text><text x="204" y="86" text-anchor="end" class="col-type">text</text>
+    <text x="26" y="102" class="col-text">status</text><text x="204" y="102" text-anchor="end" class="col-type">varchar(20) NN</text>
+    <text x="6" y="118" class="col-constraint">FK</text><text x="26" y="118" class="col-text">reviewed_by</text><text x="204" y="118" text-anchor="end" class="col-type">uuid</text>
+    <text x="26" y="134" class="col-text">assigned_role</text><text x="204" y="134" text-anchor="end" class="col-type">varchar(20)</text>
+    <text x="26" y="150" class="col-text">created_at</text><text x="204" y="150" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="166" class="col-text">updated_at</text><text x="204" y="166" text-anchor="end" class="col-type">timestamptz NN</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: refresh_tokens (right-bottom-2) -->
+  <!-- ==================== -->
+  <g transform="translate(830, 310)">
+    <rect x="0" y="0" width="210" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="210" height="84" rx="0" class="table-body"/>
+    <rect x="0" y="92" width="210" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="105" y="15" text-anchor="middle" class="table-header-text">refresh_tokens</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="204" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">user_id</text><text x="204" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">UQ</text><text x="26" y="70" class="col-text">token_hash</text><text x="204" y="70" text-anchor="end" class="col-type">varchar(255) NN</text>
+    <text x="26" y="86" class="col-text">expires_at</text><text x="204" y="86" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="102" class="col-text">created_at</text><text x="204" y="102" text-anchor="end" class="col-type">timestamptz NN</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: documents (left) -->
+  <!-- ==================== -->
+  <g transform="translate(30, 340)">
+    <rect x="0" y="0" width="220" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="220" height="212" rx="0" class="table-body"/>
+    <rect x="0" y="220" width="220" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="110" y="15" text-anchor="middle" class="table-header-text">documents</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="214" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="214" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">FK</text><text x="26" y="70" class="col-text">category_id</text><text x="214" y="70" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="86" class="col-constraint">FK</text><text x="26" y="86" class="col-text">author_id</text><text x="214" y="86" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="102" class="col-text">title</text><text x="214" y="102" text-anchor="end" class="col-type">varchar(300) NN</text>
+    <text x="26" y="118" class="col-text">slug</text><text x="214" y="118" text-anchor="end" class="col-type">varchar(300) NN</text>
+    <text x="26" y="134" class="col-text">content</text><text x="214" y="134" text-anchor="end" class="col-type">text NN</text>
+    <text x="26" y="150" class="col-text">current_version</text><text x="214" y="150" text-anchor="end" class="col-type">integer NN</text>
+    <text x="26" y="166" class="col-text">is_deleted</text><text x="214" y="166" text-anchor="end" class="col-type">boolean NN</text>
+    <text x="26" y="182" class="col-text">deleted_at</text><text x="214" y="182" text-anchor="end" class="col-type">timestamptz</text>
+    <text x="26" y="198" class="col-text">created_at</text><text x="214" y="198" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="26" y="214" class="col-text">updated_at</text><text x="214" y="214" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="6" y="230" class="col-constraint">UQ</text><text x="30" y="230" class="col-type">(workspace_id, slug)</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: document_versions (left-bottom) -->
+  <!-- ==================== -->
+  <g transform="translate(30, 610)">
+    <rect x="0" y="0" width="220" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="220" height="84" rx="0" class="table-body"/>
+    <rect x="0" y="92" width="220" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="110" y="15" text-anchor="middle" class="table-header-text">document_versions</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="214" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">document_id</text><text x="214" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="70" class="col-text">version</text><text x="214" y="70" text-anchor="end" class="col-type">integer NN</text>
+    <text x="26" y="86" class="col-text">content</text><text x="214" y="86" text-anchor="end" class="col-type">text NN</text>
+    <text x="26" y="102" class="col-text">created_at</text><text x="214" y="102" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="6" y="102" class="col-constraint">UQ</text>
+    <text x="30" y="102" class="col-type" style="display:none">(document_id, version)</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: document_relations (left-bottom-2) -->
+  <!-- ==================== -->
+  <g transform="translate(30, 750)">
+    <rect x="0" y="0" width="220" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="220" height="84" rx="0" class="table-body"/>
+    <rect x="0" y="92" width="220" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="110" y="15" text-anchor="middle" class="table-header-text">document_relations</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="214" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">source_id</text><text x="214" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="70" class="col-constraint">FK</text><text x="26" y="70" class="col-text">target_id</text><text x="214" y="70" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="86" class="col-text">type</text><text x="214" y="86" text-anchor="end" class="col-type">varchar(20) NN</text>
+    <text x="26" y="102" class="col-text">created_at</text><text x="214" y="102" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="6" y="102" class="col-constraint" style="display:none">UQ</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: categories (center-left) -->
+  <!-- ==================== -->
+  <g transform="translate(300, 530)">
+    <rect x="0" y="0" width="200" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="200" height="100" rx="0" class="table-body"/>
+    <rect x="0" y="108" width="200" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="100" y="15" text-anchor="middle" class="table-header-text">categories</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="194" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="194" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="70" class="col-text">name</text><text x="194" y="70" text-anchor="end" class="col-type">varchar(100) NN</text>
+    <text x="6" y="86" class="col-constraint">FK</text><text x="26" y="86" class="col-text">parent_id</text><text x="194" y="86" text-anchor="end" class="col-type">uuid</text>
+    <text x="26" y="102" class="col-text">created_at</text><text x="194" y="102" text-anchor="end" class="col-type">timestamptz NN</text>
+    <text x="6" y="118" class="col-constraint">UQ</text><text x="30" y="118" class="col-type">(workspace_id, parent_id, name)</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: category_closure (center-left-bottom) -->
+  <!-- ==================== -->
+  <g transform="translate(300, 700)">
+    <rect x="0" y="0" width="200" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="200" height="68" rx="0" class="table-body"/>
+    <rect x="0" y="76" width="200" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="100" y="15" text-anchor="middle" class="table-header-text">category_closure</text>
+    <text x="6" y="38" class="col-constraint">PK,FK</text><text x="40" y="38" class="col-text">ancestor_id</text><text x="194" y="38" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="54" class="col-constraint">PK,FK</text><text x="40" y="54" class="col-text">descendant_id</text><text x="194" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="70" class="col-text">depth</text><text x="194" y="70" text-anchor="end" class="col-type">integer NN</text>
+    <text x="26" y="86" class="col-type">Composite PK (ancestor_id, descendant_id)</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: tags (center-bottom) -->
+  <!-- ==================== -->
+  <g transform="translate(560, 530)">
+    <rect x="0" y="0" width="180" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="180" height="52" rx="0" class="table-body"/>
+    <rect x="0" y="60" width="180" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="90" y="15" text-anchor="middle" class="table-header-text">tags</text>
+    <text x="6" y="38" class="col-constraint">PK</text><text x="26" y="38" class="col-text">id</text><text x="174" y="38" text-anchor="end" class="col-type">uuid</text>
+    <text x="6" y="54" class="col-constraint">FK</text><text x="26" y="54" class="col-text">workspace_id</text><text x="174" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="70" class="col-text">name</text><text x="174" y="70" text-anchor="end" class="col-type">varchar(50) NN</text>
+    <text x="6" y="70" class="col-constraint">UQ</text>
+  </g>
+
+  <!-- ==================== -->
+  <!-- TABLE: document_tags (center-bottom-2) -->
+  <!-- ==================== -->
+  <g transform="translate(560, 650)">
+    <rect x="0" y="0" width="180" height="24" rx="4" ry="4" class="table-header"/>
+    <rect x="0" y="20" width="180" height="52" rx="0" class="table-body"/>
+    <rect x="0" y="60" width="180" height="12" rx="0" ry="4" class="table-body" style="stroke-width:0"/>
+    <text x="90" y="15" text-anchor="middle" class="table-header-text">document_tags</text>
+    <text x="6" y="38" class="col-constraint">PK,FK</text><text x="40" y="38" class="col-text">document_id</text><text x="174" y="38" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="6" y="54" class="col-constraint">PK,FK</text><text x="40" y="54" class="col-text">tag_id</text><text x="174" y="54" text-anchor="end" class="col-type">uuid NN</text>
+    <text x="26" y="70" class="col-type">Composite PK (document_id, tag_id)</text>
+  </g>
+
+  <!-- ====================== -->
+  <!-- RELATIONSHIP LINES     -->
+  <!-- ====================== -->
+
+  <!-- users.id -> workspaces.owner_id (1:N) -->
+  <path d="M 640,290 L 640,320" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="648" y="308" class="relation-label">1:N</text>
+
+  <!-- users.id -> workspace_members.user_id (1:N) -->
+  <path d="M 740,180 L 830,180" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="776" y="175" class="relation-label">1:N</text>
+
+  <!-- workspaces.id -> workspace_members.workspace_id (1:N) -->
+  <path d="M 740,340 L 790,340 L 790,170 L 830,170" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="795" y="260" class="relation-label">1:N</text>
+
+  <!-- users.id -> refresh_tokens.user_id (1:N) -->
+  <path d="M 740,230 L 780,230 L 780,340 L 830,340" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="785" y="300" class="relation-label">1:N</text>
+
+  <!-- workspaces.id -> invitations.workspace_id (1:N) -->
+  <path d="M 740,360 L 760,360 L 760,100 L 1100,100" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="920" y="94" class="relation-label">1:N</text>
+
+  <!-- users.id -> invitations.inviter_id (1:N) -->
+  <path d="M 740,150 L 770,150 L 770,86 L 1100,86" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="920" y="80" class="relation-label">1:N</text>
+
+  <!-- workspaces.id -> join_requests.workspace_id (1:N) -->
+  <path d="M 740,380 L 765,380 L 765,320 L 1100,320" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="920" y="314" class="relation-label">1:N</text>
+
+  <!-- users.id -> join_requests.user_id (1:N) -->
+  <path d="M 740,170 L 775,170 L 775,74 L 1080,74 L 1080,336 L 1100,336" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="1050" y="200" class="relation-label" transform="rotate(90,1050,200)">1:N</text>
+
+  <!-- users.id -> join_requests.reviewed_by (1:N) (optional) -->
+  <path d="M 740,160 L 772,160 L 772,68 L 1075,68 L 1075,384 L 1100,384" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)" stroke-dasharray="4,3"/>
+  <text x="1060" y="390" class="relation-label">0..1:N</text>
+
+  <!-- workspaces.id -> documents.workspace_id (1:N) -->
+  <path d="M 540,390 L 280,390 L 280,378 L 250,378" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="380" y="384" class="relation-label">1:N</text>
+
+  <!-- users.id -> documents.author_id (1:N) -->
+  <path d="M 540,200 L 520,200 L 520,420 L 250,420" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="370" y="414" class="relation-label">1:N</text>
+
+  <!-- documents.id -> document_versions.document_id (1:N) -->
+  <path d="M 140,572 L 140,610" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="148" y="594" class="relation-label">1:N</text>
+
+  <!-- documents.id -> document_relations.source_id (1:N) -->
+  <path d="M 100,572 L 100,750" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="108" y="680" class="relation-label">1:N (source)</text>
+
+  <!-- documents.id -> document_relations.target_id (1:N) -->
+  <path d="M 180,572 L 180,660 L 200,660 L 200,774 L 250,774" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="206" y="730" class="relation-label">1:N (target)</text>
+
+  <!-- workspaces.id -> categories.workspace_id (1:N) -->
+  <path d="M 580,488 L 580,500 L 440,500 L 440,530" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="505" y="494" class="relation-label">1:N</text>
+
+  <!-- categories.id -> categories.parent_id (self-ref 1:N) -->
+  <path d="M 300,600 L 280,600 L 280,560 L 300,560" class="relation-line" marker-start="url(#crow-many)" marker-end="url(#one)"/>
+  <text x="258" y="582" class="relation-label" text-anchor="end">self 1:N</text>
+
+  <!-- categories.id -> category_closure.ancestor_id / descendant_id (1:N) -->
+  <path d="M 400,650 L 400,700" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="408" y="678" class="relation-label">1:N</text>
+
+  <!-- categories.id -> documents.category_id (1:N, optional) -->
+  <path d="M 300,560 L 270,560 L 270,402 L 250,402" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)" stroke-dasharray="4,3"/>
+  <text x="260" y="484" class="relation-label">0..1:N</text>
+
+  <!-- workspaces.id -> tags.workspace_id (1:N) -->
+  <path d="M 650,488 L 650,530" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="658" y="512" class="relation-label">1:N</text>
+
+  <!-- tags.id -> document_tags.tag_id (1:N) -->
+  <path d="M 650,602 L 650,650" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="658" y="630" class="relation-label">1:N</text>
+
+  <!-- documents.id -> document_tags.document_id (1:N) -->
+  <path d="M 200,572 L 200,676 L 560,676" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="360" y="670" class="relation-label">1:N</text>
+
+  <!-- ====================== -->
+  <!-- CARDINALITY NOTE BOX   -->
+  <!-- ====================== -->
+  <rect x="830" y="480" width="270" height="80" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="840" y="498" class="legend-text" font-weight="bold">Relationship Notation:</text>
+  <line x1="840" y1="510" x2="870" y2="510" class="relation-line" marker-start="url(#one)" marker-end="url(#crow-many)"/>
+  <text x="880" y="514" class="legend-text">One-to-Many (1:N)</text>
+  <line x1="840" y1="530" x2="870" y2="530" class="relation-line" stroke-dasharray="4,3"/>
+  <text x="880" y="534" class="legend-text">Optional FK (nullable)</text>
+  <text x="840" y="554" class="legend-text" style="fill:#6B7280">NN = NOT NULL, UQ = UNIQUE</text>
+
+  <!-- ====================== -->
+  <!-- M:N NOTE -->
+  <!-- ====================== -->
+  <rect x="830" y="580" width="270" height="50" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="840" y="598" class="legend-text" font-weight="bold">Many-to-Many (via junction):</text>
+  <text x="840" y="616" class="legend-text">documents <tspan style="fill:#1A56DB">M:N</tspan> tags (via document_tags)</text>
+  <text x="840" y="626" class="legend-text">categories <tspan style="fill:#1A56DB">closure</tspan> (via category_closure)</text>
+
+</svg>

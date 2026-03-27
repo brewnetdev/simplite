@@ -3,8 +3,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 function loadEnv(): string {
-  // Read DATABASE_URL from apps/api/.env
-  const envPath = resolve(__dirname, '../../apps/api/.env');
+  // Read DATABASE_URL from root .env.local
+  const envPath = resolve(__dirname, '../../.env.local');
   try {
     const content = readFileSync(envPath, 'utf-8');
     for (const line of content.split('\n')) {
