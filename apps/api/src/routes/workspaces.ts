@@ -60,17 +60,21 @@ export async function workspacesRoutes(app: FastifyInstance, opts: WorkspacesRou
   // PATCH /api/v1/workspaces/:id
   app.patch<{
     Params: { id: string };
-    Body: { name?: string; isPublic?: boolean };
+    Body: { name?: string; slug?: string; isPublic?: boolean };
   }>('/workspaces/:id', {
     preHandler: requireRole('owner'),
   }, async (request, reply) => {
-    const { name, isPublic } = request.body;
+    const { name, slug, isPublic } = request.body;
 
-    if (name === undefined && isPublic === undefined) {
-      throw badRequest('MISSING_FIELDS', 'At least one field (name, isPublic) is required');
+    if (name === undefined && slug === undefined && isPublic === undefined) {
+      throw badRequest('MISSING_FIELDS', 'At least one field (name, slug, isPublic) is required');
     }
 
-    const workspace = await workspaceService.update(request.params.id, { name, isPublic });
+    if (slug !== undefined && !/^[a-z0-9-]+$/.test(slug)) {
+      throw badRequest('INVALID_SLUG', 'URL must contain only lowercase letters, numbers, and hyphens');
+    }
+
+    const workspace = await workspaceService.update(request.params.id, { name, slug, isPublic });
     return reply.status(200).send({ workspace });
   });
 

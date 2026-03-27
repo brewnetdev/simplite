@@ -3,6 +3,7 @@
 import { useState, useEffect, type FormEvent, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useWorkspaceStore } from '../../../stores/workspace-store';
 import { useAuthStore } from '../../../stores/auth-store';
 import { ApiError } from '../../../lib/api';
 
@@ -331,7 +332,16 @@ export default function LoginPage() {
 
     try {
       await login(email, password, rememberMe);
-      router.push('/');
+
+      // FR-003: 로그인 후 워크스페이스 1개면 바로 이동
+      const { fetchWorkspaces } = useWorkspaceStore.getState();
+      await fetchWorkspaces();
+      const { workspaces } = useWorkspaceStore.getState();
+      if (workspaces.length === 1 && workspaces[0]?.slug) {
+        router.push(`/${workspaces[0].slug}/docs`);
+      } else {
+        router.push('/');
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setErrorCode(err.code);

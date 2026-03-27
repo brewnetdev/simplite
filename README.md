@@ -16,7 +16,16 @@ markflow/
 └── docs/                설계 문서, 프로토타입, ERD
 ```
 
-## 로컬 실행
+## 로컬 에디터 기능 테스트
+
+```bash
+./scripts/item-test.sh all        # 전체 28개
+./scripts/item-test.sh bold       # Bold만
+./scripts/item-test.sh strike     # Strikethrough만
+./scripts/item-test.sh list       # UL+OL+Task 전체
+./scripts/item-test.sh int        # 통합 테스트 (22개 한 문서)
+./scripts/item-test.sh help       # 전체 명령어 목록
+```
 
 ### 사전 준비
 

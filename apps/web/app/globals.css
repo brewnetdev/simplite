@@ -1,5 +1,22 @@
 @import 'tailwindcss';
 
+/* Shared animation */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hide Next.js dev indicator */
+#devtools-indicator,
+.nextjs-toast,
+[data-nextjs-toast],
+[data-next-badge-root] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
 /* MarkFlow Design Tokens — extracted from markflow-prototype.html */
 :root {
   /* Colors — Neutral */

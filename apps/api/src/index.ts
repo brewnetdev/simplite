@@ -115,7 +115,7 @@ async function start() {
 
   try {
     await app.listen({ host: HOST, port: PORT });
-    logger.info(`API server listening on ${HOST}:${PORT}`);
+    logger.info(`MarkFlow API → http://localhost:${PORT}/api/v1`);
   } catch (err) {
     logger.error('Failed to start server', err);
     process.exit(1);

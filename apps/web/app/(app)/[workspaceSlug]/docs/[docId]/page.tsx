@@ -11,41 +11,26 @@ import { useWorkspaceStore } from '../../../../../stores/workspace-store';
 import { usePermissions } from '../../../../../hooks/use-permissions';
 import type { DocumentResponse } from '../../../../../lib/types';
 
-const AUTOSAVE_DELAY_MS = 1000;
-const MAX_RETRY = 3;
-
 export default function DocEditorPage() {
   const { workspaceSlug, docId } = useParams<{ workspaceSlug: string; docId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const { workspaces, currentWorkspace, setCurrentWorkspace, fetchWorkspaces } = useWorkspaceStore();
-
-  useEffect(() => {
-    if (workspaces.length === 0) void fetchWorkspaces();
-  }, [workspaces.length, fetchWorkspaces]);
-
-  useEffect(() => {
-    if (!currentWorkspace && workspaces.length > 0) {
-      const found = workspaces.find((ws) => ws.slug === workspaceSlug);
-      if (found) setCurrentWorkspace(found);
-    }
-  }, [currentWorkspace, workspaces, workspaceSlug, setCurrentWorkspace]);
-
+  const { currentWorkspace } = useWorkspaceStore();
   const wsId = currentWorkspace?.id;
-
   const permissions = usePermissions(currentWorkspace?.role);
+
   const {
     content, title, saveStatus,
     setDocument, setContent, setTitle, setSaveStatus, reset,
   } = useEditorStore();
 
   const [error, setError] = useState('');
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const retryCountRef = useRef(0);
   const isMountedRef = useRef(true);
+  const wsIdRef = useRef(wsId);
+  wsIdRef.current = wsId;
 
-  // Fetch document — fix wrapper
+  // Fetch document
   const documentQuery = useQuery({
     queryKey: ['document', wsId, docId],
     queryFn: async () => {
@@ -69,75 +54,66 @@ export default function DocEditorPage() {
     isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       reset();
     };
   }, [reset]);
 
-  // Auto-save with retry (FR-009: 실패 시 5초 후 재시도, 최대 3회)
-  const saveDocument = useCallback(
-    async (newTitle: string, newContent: string) => {
-      if (!isMountedRef.current) return;
-      setSaveStatus('saving');
-      try {
-        await apiFetch(
-          `/workspaces/${wsId}/documents/${docId}`,
-          { method: 'PATCH', body: { title: newTitle, content: newContent } },
-        );
-        if (isMountedRef.current) {
-          setSaveStatus('saved');
-          retryCountRef.current = 0;
-          void queryClient.invalidateQueries({ queryKey: ['documents', wsId] });
-        }
-      } catch (err) {
-        if (!isMountedRef.current) return;
-        setSaveStatus('error');
-        if (err instanceof ApiError) setError(err.message);
+  // 수동 저장만 — 버튼 클릭 또는 Cmd+S
+  const handleSave = useCallback(async () => {
+    const currentWsId = wsIdRef.current;
+    if (!currentWsId) {
+      setError('워크스페이스를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      return;
+    }
 
-        // Auto-retry
-        if (retryCountRef.current < MAX_RETRY) {
-          retryCountRef.current += 1;
-          saveTimerRef.current = setTimeout(() => {
-            void saveDocument(newTitle, newContent);
-          }, 5000);
-        }
+    const { title: currentTitle, content: currentContent } = useEditorStore.getState();
+    setSaveStatus('saving');
+    setError('');
+    try {
+      await apiFetch(
+        `/workspaces/${currentWsId}/documents/${docId}`,
+        { method: 'PATCH', body: { title: currentTitle, content: currentContent } },
+      );
+      if (isMountedRef.current) {
+        setSaveStatus('saved');
+        void queryClient.invalidateQueries({ queryKey: ['documents', currentWsId] });
       }
-    },
-    [wsId, docId, setSaveStatus, queryClient],
-  );
+    } catch (err) {
+      if (!isMountedRef.current) return;
+      setSaveStatus('error');
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else if (err instanceof Error) {
+        setError(err.message);
+      }
+    }
+  }, [docId, setSaveStatus, queryClient]);
 
-  // Debounced auto-save
-  const triggerAutoSave = useCallback(
-    (newTitle: string, newContent: string) => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      retryCountRef.current = 0;
-      saveTimerRef.current = setTimeout(() => {
-        void saveDocument(newTitle, newContent);
-      }, AUTOSAVE_DELAY_MS);
-    },
-    [saveDocument],
-  );
+  // Ctrl+S / Cmd+S 단축키 저장
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        void handleSave();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave]);
 
-  function handleContentChange(newContent: string) {
-    setContent(newContent);
-    triggerAutoSave(title, newContent);
-  }
+  // Beforeunload — ref로 추적하여 리스너 재등록 방지
+  const saveStatusRef = useRef(saveStatus);
+  saveStatusRef.current = saveStatus;
 
-  function handleTitleChange(newTitle: string) {
-    setTitle(newTitle);
-    triggerAutoSave(newTitle, content);
-  }
-
-  // Beforeunload warning for unsaved changes
   useEffect(() => {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
-      if (saveStatus === 'unsaved' || saveStatus === 'saving') {
+      if (saveStatusRef.current === 'unsaved') {
         e.preventDefault();
       }
     }
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [saveStatus]);
+  }, []);
 
   // Loading
   if (documentQuery.isLoading) {
@@ -151,7 +127,6 @@ export default function DocEditorPage() {
           }} />
           <p style={{ fontSize: '14px', color: 'var(--text-3)' }}>문서를 불러오는 중...</p>
         </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -206,21 +181,77 @@ export default function DocEditorPage() {
         </div>
       )}
 
-      {/* Title */}
+      {/* Title + Save button */}
       <div style={{ padding: '20px 28px 12px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => handleTitleChange(e.target.value)}
-          placeholder="제목을 입력하세요"
-          disabled={isReadOnly}
-          aria-label="문서 제목"
-          style={{
-            width: '100%', border: 'none', outline: 'none', background: 'transparent',
-            fontSize: '24px', fontWeight: 700, color: 'var(--text)',
-            fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em',
-          }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="제목을 입력하세요"
+            disabled={isReadOnly}
+            aria-label="문서 제목"
+            style={{
+              flex: 1, border: 'none', outline: 'none', background: 'transparent',
+              fontSize: '24px', fontWeight: 700, color: 'var(--text)',
+              fontFamily: 'var(--font-heading)', letterSpacing: '-0.02em',
+            }}
+          />
+          {!isReadOnly && (
+            <button
+              type="button"
+              onClick={() => void handleSave()}
+              disabled={saveStatus === 'saving' || saveStatus === 'saved'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '7px 16px', borderRadius: 'var(--radius-sm)',
+                border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 500,
+                flexShrink: 0, transition: 'background 0.15s, opacity 0.15s',
+                ...(saveStatus === 'saved'
+                  ? { background: 'var(--green-lt)', color: 'var(--green)' }
+                  : saveStatus === 'saving'
+                    ? { background: 'var(--surface-2)', color: 'var(--text-3)' }
+                    : saveStatus === 'error'
+                      ? { background: 'var(--red-lt)', color: 'var(--red)' }
+                      : { background: 'var(--accent)', color: '#fff' }),
+                ...((saveStatus === 'saving' || saveStatus === 'saved') ? { opacity: 0.7, cursor: 'default' } : {}),
+              }}
+            >
+              {saveStatus === 'saving' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                    <path d="M21 12a9 9 0 11-6.219-8.56" />
+                  </svg>
+                  저장 중...
+                </>
+              ) : saveStatus === 'saved' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  저장됨
+                </>
+              ) : saveStatus === 'error' ? (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 9v2m0 4h.01" />
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                  재시도
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                    <polyline points="17 21 17 13 7 13 7 21" />
+                    <polyline points="7 3 7 8 15 8" />
+                  </svg>
+                  저장
+                </>
+              )}
+            </button>
+          )}
+        </div>
         <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '16px', fontSize: '12px', color: 'var(--text-3)' }}>
           <span>
             마지막 수정: {new Date(doc.updatedAt).toLocaleDateString('ko-KR', {
@@ -240,12 +271,13 @@ export default function DocEditorPage() {
       <div style={{ flex: 1, overflow: 'hidden' }}>
         <MarkdownEditor
           value={content}
-          onChange={handleContentChange}
+          onChange={setContent}
           height="100%"
           layout="split"
           readOnly={isReadOnly}
         />
       </div>
+
     </div>
   );
 }

@@ -1,41 +1,22 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../stores/auth-store';
-import { useEditorStore } from '../stores/editor-store';
 import { useSidebarStore } from '../stores/sidebar-store';
-
-function SaveStatusIndicator() {
-  const saveStatus = useEditorStore((s) => s.saveStatus);
-
-  if (saveStatus === 'saving') {
-    return <span style={{ color: 'var(--text-3)', fontSize: '12px' }}>저장 중...</span>;
-  }
-  if (saveStatus === 'saved') {
-    return (
-      <span style={{ color: 'var(--green)', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-        저장됨
-      </span>
-    );
-  }
-  if (saveStatus === 'error') {
-    return <span style={{ color: 'var(--red)', fontSize: '12px' }}>저장 실패</span>;
-  }
-  return null;
-}
+import { useWorkspaceStore } from '../stores/workspace-store';
 
 function Breadcrumb() {
   const pathname = usePathname();
+  const { workspaces } = useWorkspaceStore();
   const segments = pathname.split('/').filter(Boolean);
 
   const crumbs: Array<{ label: string; href?: string }> = [];
 
-  const first = segments[0];
-  if (first !== undefined) {
-    crumbs.push({ label: first, href: `/${first}` });
+  const slug = segments[0];
+  if (slug !== undefined) {
+    const ws = workspaces.find((w) => w.slug === slug);
+    crumbs.push({ label: ws?.name ?? slug, href: `/${slug}/settings` });
   }
   const second = segments[1];
   if (second !== undefined) {
@@ -46,7 +27,8 @@ function Breadcrumb() {
       graph: '그래프',
       members: '멤버',
     };
-    crumbs.push({ label: pageLabels[second] ?? second });
+    const label = pageLabels[second] ?? second;
+    crumbs.push({ label, href: slug ? `/${slug}/${second}` : undefined });
   }
 
   return (
@@ -58,11 +40,149 @@ function Breadcrumb() {
               <polyline points="9 18 15 12 9 6" />
             </svg>
           )}
-          <span style={i === crumbs.length - 1 ? { color: 'var(--text)', fontWeight: 500 } : undefined}>
-            {c.label}
-          </span>
+          {c.href && i < crumbs.length - 1 ? (
+            <a href={c.href} style={{ color: 'inherit', textDecoration: 'none' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'inherit'; }}
+            >
+              {c.label}
+            </a>
+          ) : (
+            <span style={i === crumbs.length - 1 ? { color: 'var(--text)', fontWeight: 500 } : undefined}>
+              {c.label}
+            </span>
+          )}
         </span>
       ))}
+    </div>
+  );
+}
+
+function ProfileMenu() {
+  const user = useAuthStore((s) => s.user);
+  const { logout } = useAuthStore();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    router.push('/login');
+  }, [logout, router]);
+
+  // 외부 클릭 시 닫기
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  if (!user) return null;
+
+  return (
+    <div ref={menuRef} style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen((p) => !p)}
+        aria-label="프로필 메뉴"
+        style={{
+          width: '30px',
+          height: '30px',
+          borderRadius: '50%',
+          background: 'var(--accent-2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 600,
+          color: 'var(--accent)',
+          border: 'none',
+          cursor: 'pointer',
+        }}
+      >
+        {user.name.charAt(0).toUpperCase()}
+      </button>
+
+      {open && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '38px',
+            right: 0,
+            width: '200px',
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            boxShadow: 'var(--shadow-lg)',
+            zIndex: 100,
+            overflow: 'hidden',
+          }}
+        >
+          {/* 사용자 정보 */}
+          <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)' }}>{user.name}</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '2px' }}>{user.email}</div>
+          </div>
+
+          {/* 메뉴 항목 */}
+          <div style={{ padding: '4px' }}>
+            <button
+              onClick={() => { setOpen(false); /* TODO: 프로필 수정 모달 */ }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                fontSize: '13px',
+                color: 'var(--text-2)',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              프로필 수정
+            </button>
+
+            <button
+              onClick={() => void handleLogout()}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 10px',
+                fontSize: '13px',
+                color: 'var(--red)',
+                background: 'transparent',
+                border: 'none',
+                borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                textAlign: 'left',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--red-lt)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              로그아웃
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -70,8 +190,6 @@ function Breadcrumb() {
 export function AppHeader() {
   const user = useAuthStore((s) => s.user);
   const toggleSidebar = useSidebarStore((s) => s.toggleSidebar);
-  const pathname = usePathname();
-  const isEditorPage = /\/docs\/[^/]+$/.test(pathname);
 
   return (
     <header
@@ -106,9 +224,10 @@ export function AppHeader() {
           }}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
+            <rect x="3" y="3" width="7" height="18" rx="1" />
+            <line x1="14" y1="6" x2="21" y2="6" />
+            <line x1="14" y1="12" x2="21" y2="12" />
+            <line x1="14" y1="18" x2="21" y2="18" />
           </svg>
         </button>
 
@@ -126,7 +245,6 @@ export function AppHeader() {
 
       {/* Right: Save status + Search + User avatar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        {isEditorPage && <SaveStatusIndicator />}
 
         <button
           aria-label="검색 (⌘K)"
@@ -149,25 +267,7 @@ export function AppHeader() {
           </svg>
         </button>
 
-        {user && (
-          <div
-            style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              background: 'var(--accent-2)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '12px',
-              fontWeight: 600,
-              color: 'var(--accent)',
-            }}
-            aria-label={user.name}
-          >
-            {user.name.charAt(0).toUpperCase()}
-          </div>
-        )}
+        {user && <ProfileMenu />}
       </div>
     </header>
   );

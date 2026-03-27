@@ -459,7 +459,6 @@ export default function MembersPage() {
           <div style={s.spinner} />
           <p style={{ fontSize: 14, color: 'var(--text-3)' }}>멤버 목록을 불러오는 중...</p>
         </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -507,7 +506,6 @@ export default function MembersPage() {
         )}
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

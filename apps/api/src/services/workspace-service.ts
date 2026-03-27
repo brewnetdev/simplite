@@ -99,13 +99,24 @@ export function createWorkspaceService(db: Db) {
     }));
   }
 
-  async function update(workspaceId: string, data: { name?: string; isPublic?: boolean }) {
-    const updates: { name?: string; isPublic?: boolean; updatedAt: Date } = {
+  async function update(workspaceId: string, data: { name?: string; slug?: string; isPublic?: boolean }) {
+    const updates: { name?: string; slug?: string; isPublic?: boolean; updatedAt: Date } = {
       updatedAt: new Date(),
     };
 
     if (data.name !== undefined) {
       updates.name = data.name;
+    }
+    if (data.slug !== undefined) {
+      const existing = await db
+        .select({ id: workspaces.id })
+        .from(workspaces)
+        .where(eq(workspaces.slug, data.slug))
+        .limit(1);
+      if (existing[0] && existing[0].id !== workspaceId) {
+        throw badRequest('SLUG_EXISTS', 'This URL is already in use');
+      }
+      updates.slug = data.slug;
     }
     if (data.isPublic !== undefined) {
       updates.isPublic = data.isPublic;

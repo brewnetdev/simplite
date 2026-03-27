@@ -1,0 +1,408 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MarkFlow Test Result</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11/styles/github.min.css"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet"><style>body{font-family:DM Sans,sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.75;color:#1A1916;background:#F8F7F4}h1,h2,h3,h4,h5,h6{font-family:Sora,sans-serif;letter-spacing:-0.02em}h1{font-size:30px;font-weight:700;margin-bottom:16px}h2{font-size:22px;font-weight:600;margin:28px 0 12px;border-bottom:1px solid #E2E0D8;padding-bottom:8px}h3{font-size:18px;font-weight:600;margin:22px 0 10px}code{background:#F1F0EC;border:1px solid #E2E0D8;padding:1px 6px;border-radius:4px;font-family:JetBrains Mono,monospace;font-size:12.5px}pre{background:#1A1916;color:#e2e8f0;border-radius:10px;padding:16px 20px;margin:16px 0;overflow-x:auto}pre code{background:none;border:none;padding:0;color:inherit}blockquote{border-left:3px solid #1A56DB;margin:16px 0;padding:12px 20px;background:#EEF3FF;border-radius:0 6px 6px 0}table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}th,td{border:1px solid #E2E0D8;padding:8px 12px}th{background:#F1F0EC;font-weight:600}ul{list-style-type:disc;padding-left:1.5em}ol{list-style-type:decimal;padding-left:1.5em}ul.contains-task-list{list-style-type:none;padding-left:0}li{margin:0.25em 0}hr{border:none;border-top:1px solid #E2E0D8;margin:24px 0}del{opacity:0.5;text-decoration:line-through}a{color:#1A56DB}img{max-width:100%;border-radius:8px}.katex-display{margin:16px 0;overflow-x:auto}input[type=checkbox]{margin-right:0.4em}.banner{background:#EEF3FF;border:1px solid #1A56DB;border-radius:10px;padding:16px 20px;margin-bottom:32px}.banner h3{margin:0 0 8px;color:#1A56DB;font-size:16px}.banner p{margin:0;font-size:14px;color:#57564F}</style></head><body><div class="banner"><h3>MarkFlow Test Result — parseMarkdown() 렌더링 결과</h3><p>에디터 프리뷰(Split View 우측)와 이 HTML을 비교하세요.</p></div><h1>MarkFlow 에디터 기능 테스트</h1>
+<p>이 문서는 22개 툴바 액션과 중첩 구조를 종합 테스트합니다.</p>
+<h2>1. 헤딩 (H1~H6)</h2>
+<h1>헤딩 1</h1>
+<h2>헤딩 2</h2>
+<h3>헤딩 3</h3>
+<h4>헤딩 4</h4>
+<h5>헤딩 5</h5>
+<h6>헤딩 6</h6>
+<hr>
+<h2>2. 인라인 서식</h2>
+<p><strong>볼드 텍스트입니다.</strong></p>
+<p><em>이텔릭 텍스트입니다.</em></p>
+<p><del>취소선 텍스트입니다.</del></p>
+<p><code>인라인 코드입니다.</code></p>
+<p><strong>볼드 안에 <em>이텔릭</em> 중첩</strong></p>
+<p><em><strong>볼드+이텔릭 동시 적용</strong></em></p>
+<p><strong>볼드 안에 <code>코드</code> 포함</strong></p>
+<p><em>이텔릭 안에 <del>취소선</del> 포함</em></p>
+<p><del>취소선 안에 <strong>볼드</strong> 포함</del></p>
+<p>이것은 일반 텍스트 중간에 <strong>볼드</strong>, <em>이텔릭</em>, <del>취소선</del>, <code>코드</code>가 섞인 문장입니다.</p>
+<hr>
+<h2>3. 리스트</h2>
+<h3>3.1 순서 없는 리스트 (Bullet)</h3>
+<ul>
+<li>첫 번째 항목</li>
+<li>두 번째 항목</li>
+<li>세 번째 항목</li>
+</ul>
+<h3>3.2 중첩 리스트</h3>
+<ul>
+<li>과일
+<ul>
+<li>사과</li>
+<li>바나나
+<ul>
+<li>바나나 우유</li>
+<li>바나나 칩</li>
+</ul>
+</li>
+<li>포도</li>
+</ul>
+</li>
+<li>채소
+<ul>
+<li>당근</li>
+<li>브로콜리</li>
+</ul>
+</li>
+</ul>
+<h3>3.3 순서 있는 리스트 (Number)</h3>
+<ol>
+<li>첫 번째</li>
+<li>두 번째</li>
+<li>세 번째</li>
+</ol>
+<h3>3.4 중첩 순서 리스트</h3>
+<ol>
+<li>프로젝트 설정
+<ol>
+<li>의존성 설치</li>
+<li>환경 변수 설정</li>
+<li>DB 마이그레이션</li>
+</ol>
+</li>
+<li>개발
+<ol>
+<li>백엔드 API</li>
+<li>프론트엔드 UI</li>
+</ol>
+</li>
+<li>배포</li>
+</ol>
+<h3>3.5 혼합 리스트</h3>
+<ol>
+<li>첫 번째 단계
+<ul>
+<li>세부 사항 A</li>
+<li>세부 사항 B</li>
+</ul>
+</li>
+<li>두 번째 단계
+<ul>
+<li>세부 사항 C
+<ol>
+<li>하위 순서 1</li>
+<li>하위 순서 2</li>
+</ol>
+</li>
+<li>세부 사항 D</li>
+</ul>
+</li>
+</ol>
+<h3>3.6 체크리스트</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" disabled> 미완료 항목</li>
+<li class="task-list-item"><input type="checkbox" checked disabled> 완료된 항목</li>
+<li class="task-list-item"><input type="checkbox" disabled> <strong>볼드 체크리스트</strong></li>
+<li class="task-list-item"><input type="checkbox" checked disabled> <del>완료 후 취소선</del></li>
+<li class="task-list-item"><input type="checkbox" disabled> <code>코드 포함</code> 체크리스트</li>
+</ul>
+<hr>
+<h2>4. 인용문</h2>
+<blockquote>
+<p>단일 인용문입니다.</p>
+</blockquote>
+<blockquote>
+<p>여러 줄 인용문입니다.
+두 번째 줄입니다.
+세 번째 줄입니다.</p>
+</blockquote>
+<blockquote>
+<p>중첩 인용문:</p>
+<blockquote>
+<p>안쪽 인용문입니다.</p>
+<blockquote>
+<p>더 안쪽 인용문입니다.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<blockquote>
+<p><strong>볼드 인용문</strong>과 <em>이텔릭 인용문</em>이 섞인 경우입니다.</p>
+<p><code>코드</code>도 인용문 안에 들어갑니다.</p>
+<ul>
+<li>인용문 안의 리스트</li>
+<li>두 번째 항목</li>
+</ul>
+</blockquote>
+<hr>
+<h2>5. 코드</h2>
+<h3>5.1 인라인 코드</h3>
+<p>변수 <code>count</code>의 값은 <code>42</code>입니다. <code>npm install</code> 명령어를 실행하세요.</p>
+<h3>5.2 코드 블록 (언어 없음)</h3>
+<pre><code class="language-css">plain <span class="hljs-selector-tag">text</span> <span class="hljs-selector-tag">code</span> block
+no syntax highlighting
+</code></pre>
+<h3>5.3 JavaScript</h3>
+<pre><code class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">fibonacci</span>(<span class="hljs-params">n</span>) {
+  <span class="hljs-keyword">if</span> (n &#x3C;= <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> n;
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">fibonacci</span>(n - <span class="hljs-number">1</span>) + <span class="hljs-title function_">fibonacci</span>(n - <span class="hljs-number">2</span>);
+}
+
+<span class="hljs-keyword">const</span> result = <span class="hljs-title function_">fibonacci</span>(<span class="hljs-number">10</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">`Result: <span class="hljs-subst">${result}</span>`</span>);
+</code></pre>
+<h3>5.4 TypeScript</h3>
+<pre><code class="language-typescript"><span class="hljs-keyword">interface</span> <span class="hljs-title class_">User</span> {
+  <span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">email</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-title class_">Date</span>;
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">fetchUser</span>(<span class="hljs-params"><span class="hljs-attr">id</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-title class_">Promise</span>&#x3C;<span class="hljs-title class_">User</span>> {
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">`/api/users/<span class="hljs-subst">${id}</span>`</span>);
+  <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">'User not found'</span>);
+  <span class="hljs-keyword">return</span> response.<span class="hljs-title function_">json</span>();
+}
+</code></pre>
+<h3>5.5 SQL</h3>
+<pre><code class="language-sql"><span class="hljs-keyword">SELECT</span> u.name, <span class="hljs-built_in">COUNT</span>(d.id) <span class="hljs-keyword">AS</span> doc_count
+<span class="hljs-keyword">FROM</span> users u
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> documents d <span class="hljs-keyword">ON</span> d.author_id <span class="hljs-operator">=</span> u.id
+<span class="hljs-keyword">WHERE</span> u.email_verified <span class="hljs-operator">=</span> <span class="hljs-literal">true</span>
+<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> u.name
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> doc_count <span class="hljs-keyword">DESC</span>
+LIMIT <span class="hljs-number">10</span>;
+</code></pre>
+<h3>5.6 CSS</h3>
+<pre><code class="language-css"><span class="hljs-selector-class">.mf-preview</span> {
+  <span class="hljs-attribute">font-family</span>: <span class="hljs-built_in">var</span>(--mf-font-body);
+  <span class="hljs-attribute">line-height</span>: <span class="hljs-built_in">var</span>(--mf-line-height);
+  <span class="hljs-attribute">max-width</span>: <span class="hljs-built_in">var</span>(--mf-max-width);
+  <span class="hljs-attribute">color</span>: <span class="hljs-built_in">var</span>(--mf-text);
+}
+</code></pre>
+<h3>5.7 Bash</h3>
+<pre><code class="language-bash"><span class="hljs-meta">#!/bin/bash</span>
+pnpm install
+pnpm --filter @markflow/editor build
+pnpm dev
+</code></pre>
+<hr>
+<h2>6. 수평선</h2>
+<p>위 텍스트</p>
+<hr>
+<p>아래 텍스트</p>
+<hr>
+<p>다른 스타일의 수평선</p>
+<hr>
+<p>세 번째 스타일</p>
+<hr>
+<h2>7. 링크</h2>
+<p><a href="https://markflow.dev">MarkFlow 홈페이지</a></p>
+<p><a href="https://github.com/markflow/editor" title="MarkFlow Editor">GitHub 저장소</a></p>
+<p>자동 링크: <a href="https://example.com">https://example.com</a></p>
+<p>이메일: <a href="mailto:user@example.com">user@example.com</a></p>
+<p>문장 안의 <a href="https://example.com">링크 텍스트</a>가 자연스럽게 들어갑니다.</p>
+<hr>
+<h2>8. 이미지</h2>
+<p><img src="https://via.placeholder.com/600x200/1A56DB/FFFFFF?text=MarkFlow+Editor" alt="MarkFlow 로고"></p>
+<p><img src="https://via.placeholder.com/32x32/16A34A/FFFFFF?text=OK" alt="작은 아이콘"></p>
+<p>텍스트 사이에 <img src="https://via.placeholder.com/80x20/D97706/FFFFFF?text=badge" alt="인라인 이미지"> 배지를 넣을 수 있습니다.</p>
+<hr>
+<h2>9. 테이블</h2>
+<h3>9.1 기본 테이블</h3>
+<table>
+<thead>
+<tr>
+<th>기능</th>
+<th>상태</th>
+<th>비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>헤딩</td>
+<td>✅ 완료</td>
+<td>H1~H6</td>
+</tr>
+<tr>
+<td>볼드</td>
+<td>✅ 완료</td>
+<td><strong>bold</strong></td>
+</tr>
+<tr>
+<td>이텔릭</td>
+<td>✅ 완료</td>
+<td><em>italic</em></td>
+</tr>
+<tr>
+<td>취소선</td>
+<td>✅ 완료</td>
+<td><del>strike</del></td>
+</tr>
+</tbody>
+</table>
+<h3>9.2 정렬 테이블</h3>
+<table>
+<thead>
+<tr>
+<th align="left">왼쪽 정렬</th>
+<th align="center">가운데 정렬</th>
+<th align="right">오른쪽 정렬</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Left</td>
+<td align="center">Center</td>
+<td align="right">Right</td>
+</tr>
+<tr>
+<td align="left">데이터 1</td>
+<td align="center">데이터 2</td>
+<td align="right">데이터 3</td>
+</tr>
+<tr>
+<td align="left">긴 텍스트 왼쪽</td>
+<td align="center">중앙</td>
+<td align="right">10,000</td>
+</tr>
+</tbody>
+</table>
+<h3>9.3 테이블 안 서식</h3>
+<table>
+<thead>
+<tr>
+<th>서식</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>볼드</td>
+<td><strong>강조</strong></td>
+</tr>
+<tr>
+<td>이텔릭</td>
+<td><em>기울임</em></td>
+</tr>
+<tr>
+<td>코드</td>
+<td><code>console.log()</code></td>
+</tr>
+<tr>
+<td>링크</td>
+<td><a href="https://example.com">링크</a></td>
+</tr>
+<tr>
+<td>취소선</td>
+<td><del>삭제</del></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>10. 수학 수식</h2>
+<h3>10.1 인라인 수식</h3>
+<p>피타고라스 정리: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>a</mi><mn>2</mn></msup><mo>+</mo><msup><mi>b</mi><mn>2</mn></msup><mo>=</mo><msup><mi>c</mi><mn>2</mn></msup></mrow><annotation>a^2 + b^2 = c^2</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></p>
+<p>오일러 공식: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><msup><mi>e</mi><mrow><mi>i</mi><mi>π</mi></mrow></msup><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation>e^{i\pi} + 1 = 0</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.908em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">iπ</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></p>
+<p>이차방정식의 근: <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>x</mi><mo>=</mo><mfrac><mrow><mo>−</mo><mi>b</mi><mo>±</mo><msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>−</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt></mrow><mrow><mn>2</mn><mi>a</mi></mrow></mfrac></mrow><annotation>x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3845em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0395em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="mord mathnormal mtight">a</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight">b</span><span class="mbin mtight">±</span><span class="mord sqrt mtight"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9221em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mtight" style="padding-left:0.833em;"><span class="mord mtight"><span class="mord mathnormal mtight">b</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mbin mtight">−</span><span class="mord mtight">4</span><span class="mord mathnormal mtight">a</span><span class="mord mathnormal mtight">c</span></span></span><span style="top:-2.8821em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail mtight" style="min-width:0.853em;height:1.08em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1179em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></p>
+<h3>10.2 블록 수식</h3>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msubsup><mo>∫</mo><mn>0</mn><mi>∞</mi></msubsup><msup><mi>e</mi><mrow><mo>−</mo><msup><mi>x</mi><mn>2</mn></msup></mrow></msup><mi>d</mi><mi>x</mi><mo>=</mo><mfrac><msqrt><mi>π</mi></msqrt><mn>2</mn></mfrac></mrow><annotation>\int_{0}^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:2.3262em;vertical-align:-0.9119em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4143em;"><span style="top:-1.7881em;margin-left:-0.4445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.8129em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:1.0369em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight"><span class="mord mathnormal mtight">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="mord mathnormal">d</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1633em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4773em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8003em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span></span></span><span style="top:-2.7603em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2397em;"><span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mi>∞</mi><mfrac><mn>1</mn><msup><mi>n</mi><mn>2</mn></msup></mfrac><mo>=</mo><mfrac><msup><mi>π</mi><mn>2</mn></msup><mn>6</mn></mfrac></mrow><annotation>\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:2.9185em;vertical-align:-1.2671em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.6514em;"><span style="top:-1.8829em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">∞</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2671em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7401em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.1771em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">6</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span>
+<span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mrow><mo>(</mo><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable><mo>)</mo></mrow><mrow><mo>(</mo><mtable><mtr><mtd><mi>x</mi></mtd></mtr><mtr><mtd><mi>y</mi></mtd></mtr></mtable><mo>)</mo></mrow><mo>=</mo><mrow><mo>(</mo><mtable><mtr><mtd><mrow><mi>a</mi><mi>x</mi><mo>+</mo><mi>b</mi><mi>y</mi></mrow></mtd></mtr><mtr><mtd><mrow><mi>c</mi><mi>x</mi><mo>+</mo><mi>d</mi><mi>y</mi></mrow></mtd></mtr></mtable><mo>)</mo></mrow></mrow><annotation>\begin{pmatrix}
+a &#x26; b \\
+c &#x26; d
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+=
+\begin{pmatrix}
+ax + by \\
+cx + dy
+\end{pmatrix}</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">a</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:0.5em;"></span><span class="arraycolsep" style="width:0.5em;"></span><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">b</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">x</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.45em;"><span style="top:-3.61em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">b</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.95em;"><span></span></span></span></span></span></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span>
+<hr>
+<h2>11. 복합 중첩 테스트</h2>
+<h3>인용문 안 코드 블록</h3>
+<blockquote>
+<p>설정 파일을 확인하세요:</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">"name"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"markflow"</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">"version"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"0.1.0"</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+</blockquote>
+<h3>리스트 안 코드와 서식</h3>
+<ol>
+<li><strong>설치 방법</strong>
+<pre><code class="language-bash">pnpm install @markflow/editor
+</code></pre>
+</li>
+<li><em>사용법</em>
+<pre><code class="language-typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">MarkdownEditor</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">'@markflow/editor'</span>;
+</code></pre>
+</li>
+<li><del>이전 방식</del> (deprecated)</li>
+</ol>
+<h3>리스트 안 인용문</h3>
+<ul>
+<li>첫 번째 항목
+<blockquote>
+<p>이것은 리스트 안의 인용문입니다.</p>
+</blockquote>
+</li>
+<li>두 번째 항목
+<blockquote>
+<p>또 다른 인용문</p>
+</blockquote>
+</li>
+</ul>
+<h3>테이블 + 수식</h3>
+<table>
+<thead>
+<tr>
+<th>공식</th>
+<th>수식</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>넓이</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>S</mi><mo>=</mo><mi>π</mi><msup><mi>r</mi><mn>2</mn></msup></mrow><annotation>S = \pi r^2</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></td>
+<td>원의 넓이</td>
+</tr>
+<tr>
+<td>둘레</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>C</mi><mo>=</mo><mn>2</mn><mi>π</mi><mi>r</mi></mrow><annotation>C = 2\pi r</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span></td>
+<td>원의 둘레</td>
+</tr>
+<tr>
+<td>체적</td>
+<td><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>V</mi><mo>=</mo><mfrac><mn>4</mn><mn>3</mn></mfrac><mi>π</mi><msup><mi>r</mi><mn>3</mn></msup></mrow><annotation>V = \frac{4}{3}\pi r^3</annotation></semantics></math></span><span class="katex-html"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">4</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></td>
+<td>구의 체적</td>
+</tr>
+</tbody>
+</table>
+<h3>체크리스트 + 서식 복합</h3>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" checked disabled> <strong>Phase 1</strong>: 에디터 패키지 <del>완료</del></li>
+<li class="task-list-item"><input type="checkbox" checked disabled> <strong>Phase 2</strong>: KMS 백엔드 (<code>Fastify</code> + <code>Drizzle</code>)</li>
+<li class="task-list-item"><input type="checkbox" disabled> <strong>Phase 3</strong>: 프론트엔드 <code>Next.js</code> 16</li>
+<li class="task-list-item"><input type="checkbox" disabled> <strong>Phase 4</strong>: <a href="https://vercel.com">배포</a> 및 <em>모니터링</em></li>
+</ul>
+<hr>
+<h2>12. 특수 케이스</h2>
+<h3>긴 텍스트 줄바꿈</h3>
+<p>이것은 매우 긴 문장입니다. 마크다운 에디터에서 긴 텍스트가 올바르게 줄바꿈되는지 확인합니다. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+<h3>이스케이프 문자</h3>
+<p>*별표 이스케이프*</p>
+<p>`백틱 이스케이프`</p>
+<p>~~취소선 이스케이프~~</p>
+<p>[링크 이스케이프](url)</p>
+<h3>HTML 엔티티</h3>
+<p>&#x3C;script>alert('XSS')&#x3C;/script></p>
+<p>&#x26; &#x3C; > " '</p>
+<h3>빈 요소</h3>
+<ul>
+<li></li>
+</ul>
+<blockquote>
+</blockquote>
+<pre><code class=""></code></pre>
+<hr>
+<p><em>문서 끝 — 모든 22개 액션 + 중첩 구조 테스트 완료</em></p></body></html>

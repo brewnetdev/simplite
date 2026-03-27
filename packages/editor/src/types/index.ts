@@ -56,6 +56,10 @@ export interface PreviewPaneProps {
   onScrollRatio?: (ratio: number) => void
 }
 
+export interface PreviewPaneHandle {
+  scrollToHeading: (headingText: string) => void
+}
+
 export interface ToolbarProps {
   onAction: (action: ToolbarAction) => void
   layout: EditorLayout

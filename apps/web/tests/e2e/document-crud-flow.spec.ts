@@ -44,12 +44,12 @@ test.describe('US3: 문서 CRUD 정상 동작', () => {
     expect(page.url()).toMatch(/\/[^/]+\/docs\/[^/]+/);
   });
 
-  test('에디터에서 마크다운 입력 → 자동 저장 (SC-004: 30초 이내)', async ({ page }) => {
+  test('에디터에서 마크다운 입력 → 수동 저장 (Cmd+S)', async ({ page }) => {
     // 새 문서 생성
     const newDocBtn = page.locator('button:has-text("새 문서")');
     await newDocBtn.click();
     const modal = page.locator('.modal');
-    await modal.locator('input[type="text"]').fill('자동저장 테스트 ' + Date.now());
+    await modal.locator('input[type="text"]').fill('저장 테스트 ' + Date.now());
     await modal.locator('button:has-text("만들기"), button:has-text("생성")').click();
     await page.waitForURL(/\/[^/]+\/docs\/[^/]+/, { timeout: 5000 });
 
@@ -59,10 +59,13 @@ test.describe('US3: 문서 CRUD 정상 동작', () => {
 
     // 마크다운 입력
     await editor.click();
-    await page.keyboard.type('# Hello World\n\n자동 저장 테스트입니다.');
+    await page.keyboard.type('# Hello World\n\n수동 저장 테스트입니다.');
 
-    // 자동 저장 확인 — 저장됨 상태 확인 (헤더의 SaveStatusIndicator)
-    await expect(page.locator('text=저장됨')).toBeVisible({ timeout: 5000 });
+    // Cmd+S로 저장
+    await page.keyboard.press('Meta+s');
+
+    // 저장 완료 확인 — 제목 옆 저장 버튼 상태
+    await expect(page.locator('button:has-text("저장됨")')).toBeVisible({ timeout: 5000 });
   });
 
   test('자동 저장된 문서 → 새로고침 후 내용 유지', async ({ page }) => {

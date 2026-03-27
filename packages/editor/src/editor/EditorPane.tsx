@@ -149,13 +149,15 @@ export const EditorPane = React.forwardRef<EditorView | null, EditorPaneProps>(
               }
             }),
             EditorView.domEventHandlers({
-              scroll(event, view) {
+              mouseup(_event, view) {
+                // 클릭 시 커서 위치 기반으로 프리뷰 동기화 트리거
                 const el = view.scrollDOM
                 const ratio =
                   el.scrollHeight === el.clientHeight
                     ? 0
                     : el.scrollTop / (el.scrollHeight - el.clientHeight)
                 onScrollRatio?.(ratio)
+                return false
               },
               drop(event) {
                 const files = event.dataTransfer?.files

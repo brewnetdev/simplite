@@ -64,7 +64,9 @@ const styles = {
   input: {
     display: 'block',
     width: '100%',
-    border: '1.5px solid var(--border)',
+    borderWidth: '1.5px',
+    borderStyle: 'solid',
+    borderColor: 'var(--border)',
     borderRadius: 'var(--radius-sm)',
     padding: '10px 13px',
     fontSize: 14,
@@ -307,6 +309,7 @@ export default function WorkspaceSettingsPage() {
 
   // Edit form
   const [editName, setEditName] = useState('');
+  const [editSlug, setEditSlug] = useState('');
   const [editIsPublic, setEditIsPublic] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -316,7 +319,8 @@ export default function WorkspaceSettingsPage() {
   const [deleteConfirmName, setDeleteConfirmName] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const permissions = usePermissions(workspace?.role ?? null);
+  // workspace detail API에 role이 없으므로 목록에서 가져온 currentWorkspace.role 사용
+  const permissions = usePermissions(currentWorkspace?.role ?? null);
 
   useEffect(() => {
     if (!wsId) return;
@@ -329,6 +333,7 @@ export default function WorkspaceSettingsPage() {
         );
         setWorkspace(data.workspace);
         setEditName(data.workspace.name);
+        setEditSlug(data.workspace.slug);
         setEditIsPublic(data.workspace.isPublic);
       } catch (err) {
         if (err instanceof ApiError) {
@@ -353,6 +358,11 @@ export default function WorkspaceSettingsPage() {
       setError('워크스페이스 이름을 입력해주세요.');
       return;
     }
+    if (!editSlug.trim() || !/^[a-z0-9-]+$/.test(editSlug.trim())) {
+      setError('URL은 영문 소문자, 숫자, 하이픈(-)만 사용할 수 있습니다.');
+      return;
+    }
+    if (!workspace) return;
 
     setIsSaving(true);
     try {
@@ -360,14 +370,32 @@ export default function WorkspaceSettingsPage() {
         `/workspaces/${wsId}`,
         {
           method: 'PATCH',
-          body: { name: editName.trim(), isPublic: editIsPublic },
+          body: {
+            name: editName.trim(),
+            slug: editSlug.trim() !== workspace.slug ? editSlug.trim() : undefined,
+            isPublic: editIsPublic,
+          },
         },
       );
       setWorkspace(data.workspace);
+      setEditSlug(data.workspace.slug);
       setSuccessMessage('설정이 저장되었습니다.');
-      await fetchWorkspaces();
+
+      // slug가 변경되었으면 store 갱신 후 새 URL로 이동
+      if (data.workspace.slug !== workspaceSlug) {
+        await fetchWorkspaces();
+        const { workspaces: updated } = useWorkspaceStore.getState();
+        const newWs = updated.find((ws) => ws.id === wsId);
+        if (newWs) setCurrentWorkspace(newWs);
+        router.replace(`/${data.workspace.slug}/settings`);
+      } else {
+        await fetchWorkspaces();
+      }
     } catch (err) {
       if (err instanceof ApiError) {
+        setError(err.message);
+      } else if (err instanceof Error) {
+        console.error('Settings save error:', err);
         setError(err.message);
       } else {
         setError('설정 저장 중 오류가 발생했습니다.');
@@ -417,7 +445,6 @@ export default function WorkspaceSettingsPage() {
           <div style={styles.spinner} />
           <p style={{ fontSize: 14, color: 'var(--text-3)' }}>설정을 불러오는 중...</p>
         </div>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -478,6 +505,46 @@ export default function WorkspaceSettingsPage() {
               style={getInputStyle('name')}
               placeholder="워크스페이스 이름"
             />
+          </div>
+
+          {/* Workspace Slug */}
+          <div style={styles.fieldGroup}>
+            <label htmlFor="settingsSlug" style={styles.label}>
+              워크스페이스 URL
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0' }}>
+              <span style={{
+                padding: '10px 12px',
+                fontSize: 14,
+                color: 'var(--text-3)',
+                background: 'var(--surface-2)',
+                borderWidth: '1.5px',
+                borderStyle: 'solid',
+                borderColor: 'var(--border)',
+                borderRight: 'none',
+                borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)',
+                whiteSpace: 'nowrap' as const,
+              }}>
+                {typeof window !== 'undefined' ? window.location.host : ''}/
+              </span>
+              <input
+                id="settingsSlug"
+                type="text"
+                value={editSlug}
+                onChange={(e) => setEditSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                onFocus={() => setFocusedField('slug')}
+                onBlur={() => setFocusedField(null)}
+                style={{
+                  ...getInputStyle('slug'),
+                  borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
+                  flex: 1,
+                }}
+                placeholder="workspace-url"
+              />
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>
+              영문 소문자, 숫자, 하이픈(-)만 사용 가능. 중복 불가.
+            </p>
           </div>
 
           {/* Public/Private Toggle */}
@@ -589,7 +656,6 @@ export default function WorkspaceSettingsPage() {
         </div>
       )}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

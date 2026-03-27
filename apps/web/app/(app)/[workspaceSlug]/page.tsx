@@ -53,7 +53,6 @@ export default function WorkspaceHomePage() {
         />
         <p style={{ fontSize: '14px', color: 'var(--text-3)' }}>이동 중...</p>
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

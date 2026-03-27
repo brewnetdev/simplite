@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuthStore } from '../stores/auth-store';
+import { usePathname } from 'next/navigation';
 import { useWorkspaceStore } from '../stores/workspace-store';
 import { CategoryTree, type Category as TreeCategory } from './category-tree';
 import { apiFetch } from '../lib/api';
@@ -69,45 +68,161 @@ const NAV_ITEMS: NavDef[] = [
 /* ─── T015: Workspace Selector ─── */
 
 function WorkspaceSelector({ slug }: { slug: string | null }) {
-  const { workspaces } = useWorkspaceStore();
+  const { workspaces, fetchWorkspaces } = useWorkspaceStore();
   const current = workspaces.find((ws) => ws.slug === slug);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // 워크스페이스 목록이 비어있으면 fetch
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      void fetchWorkspaces();
+    }
+  }, [workspaces.length, fetchWorkspaces]);
+
+  // 외부 클릭 시 닫기
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
 
   return (
-    <Link
-      href="/"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        padding: '10px 14px',
-        margin: '8px 10px',
-        borderRadius: 'var(--radius-sm)',
-        textDecoration: 'none',
-        color: 'inherit',
-        transition: 'background 0.15s',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-    >
-      <div style={{
-        width: '28px', height: '28px', borderRadius: '6px',
-        background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#fff', fontSize: '12px', fontWeight: 700, flexShrink: 0,
-      }}>
-        {current ? current.name.charAt(0).toUpperCase() : 'M'}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
+    <div ref={ref} style={{ position: 'relative', margin: '8px 10px' }}>
+      {/* 현재 워크스페이스 버튼 */}
+      <button
+        onClick={() => setOpen((p) => !p)}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px 14px',
+          borderRadius: 'var(--radius-sm)',
+          border: 'none',
+          background: open ? 'var(--surface-2)' : 'transparent',
+          cursor: 'pointer',
+          color: 'inherit',
+          transition: 'background 0.15s',
+          textAlign: 'left',
+        }}
+        onMouseEnter={(e) => { if (!open) e.currentTarget.style.background = 'var(--surface-2)'; }}
+        onMouseLeave={(e) => { if (!open) e.currentTarget.style.background = 'transparent'; }}
+      >
         <div style={{
-          fontSize: '13.5px', fontWeight: 600, color: 'var(--text)',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+          width: '28px', height: '28px', borderRadius: '6px',
+          background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#fff', fontSize: '12px', fontWeight: 700, flexShrink: 0,
         }}>
-          {current?.name ?? 'MarkFlow'}
+          {current ? current.name.charAt(0).toUpperCase() : 'M'}
         </div>
-      </div>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2" style={{ flexShrink: 0 }}>
-        <polyline points="6 9 12 15 18 9" />
-      </svg>
-    </Link>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            fontSize: '13.5px', fontWeight: 600, color: 'var(--text)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+          }}>
+            {current?.name ?? 'MarkFlow'}
+          </div>
+        </div>
+        <svg
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" strokeWidth="2"
+          style={{ flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {/* 워크스페이스 드롭다운 목록 */}
+      {open && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          marginTop: '4px',
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          boxShadow: 'var(--shadow-lg)',
+          zIndex: 50,
+          maxHeight: '240px',
+          overflowY: 'auto',
+          padding: '4px',
+        }}>
+          {workspaces.map((ws) => (
+            <Link
+              key={ws.id}
+              href={`/${ws.slug}/docs`}
+              onClick={() => setOpen(false)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                padding: '8px 10px',
+                borderRadius: 'var(--radius-sm)',
+                textDecoration: 'none',
+                color: 'inherit',
+                background: ws.slug === slug ? 'var(--accent-2)' : 'transparent',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = ws.slug === slug ? 'var(--accent-2)' : 'var(--surface-2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = ws.slug === slug ? 'var(--accent-2)' : 'transparent'; }}
+            >
+              <div style={{
+                width: '24px', height: '24px', borderRadius: '5px',
+                background: ws.slug === slug ? 'var(--accent)' : 'var(--surface-3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: ws.slug === slug ? '#fff' : 'var(--text-2)',
+                fontSize: '11px', fontWeight: 700, flexShrink: 0,
+              }}>
+                {ws.name.charAt(0).toUpperCase()}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontSize: '13px', fontWeight: ws.slug === slug ? 600 : 400,
+                  color: ws.slug === slug ? 'var(--accent)' : 'var(--text)',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const,
+                }}>
+                  {ws.name}
+                </div>
+              </div>
+              {ws.slug === slug && (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" style={{ flexShrink: 0 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              )}
+            </Link>
+          ))}
+
+          {/* 워크스페이스 목록 전체 보기 */}
+          <div style={{ borderTop: '1px solid var(--border)', marginTop: '4px', paddingTop: '4px' }}>
+            <Link
+              href="/"
+              onClick={() => setOpen(false)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '8px 10px', borderRadius: 'var(--radius-sm)',
+                textDecoration: 'none', fontSize: '12px', color: 'var(--text-3)',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+              </svg>
+              전체 워크스페이스
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -235,59 +350,6 @@ function NavSection({ slug }: { slug: string }) {
   );
 }
 
-/* ─── T019: User Profile Footer ─── */
-
-function UserFooter() {
-  const { user, logout } = useAuthStore();
-  const router = useRouter();
-  const workspaces = useWorkspaceStore((s) => s.workspaces);
-  const pathname = usePathname();
-  const slug = extractWorkspaceSlug(pathname);
-  const currentWs = workspaces.find((ws) => ws.slug === slug);
-
-  const handleLogout = useCallback(async () => {
-    await logout();
-    router.push('/login');
-  }, [logout, router]);
-
-  return (
-    <div style={{
-      borderTop: '1px solid var(--border)', padding: '10px 14px',
-      display: 'flex', alignItems: 'center', gap: '10px',
-    }}>
-      <div style={{
-        width: '28px', height: '28px', borderRadius: '50%',
-        background: 'var(--accent-2)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: 'var(--accent)', fontSize: '11px', fontWeight: 600, flexShrink: 0,
-      }}>
-        {user?.name?.charAt(0).toUpperCase() ?? '?'}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
-          {user?.name ?? '사용자'}
-        </div>
-        <div style={{ fontSize: '11px', color: 'var(--text-3)' }}>
-          {currentWs?.role ? { owner: '소유자', admin: '관리자', editor: '편집자', viewer: '뷰어' }[currentWs.role] ?? currentWs.role : ''}
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={() => void handleLogout()}
-        aria-label="로그아웃"
-        style={{
-          width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          borderRadius: 'var(--radius-sm)', border: 'none', background: 'transparent',
-          cursor: 'pointer', color: 'var(--text-3)', flexShrink: 0,
-        }}
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-      </button>
-    </div>
-  );
-}
-
 /* ─── Main Sidebar ─── */
 
 export function Sidebar() {
@@ -320,8 +382,6 @@ export function Sidebar() {
         {slug && <NavSection slug={slug} />}
       </div>
 
-      {/* T019: User Footer */}
-      <UserFooter />
     </aside>
   );
 }

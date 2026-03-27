@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Sora, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
 import './globals.css';
+import 'react-grab/styles.css';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',

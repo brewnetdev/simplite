@@ -12,7 +12,7 @@ import { ImageUploadGuide } from './toolbar/ImageUploadGuide'
 import { applyToolbarAction } from './utils/markdownActions'
 import { createCloudflareUploader } from './utils/cloudflareUploader'
 import { validateImageFile } from './utils/imageValidation'
-import type { MarkdownEditorProps, EditorLayout, EditorTheme, ToolbarAction } from './types'
+import type { MarkdownEditorProps, EditorLayout, EditorTheme, ToolbarAction, PreviewPaneHandle } from './types'
 
 const DEFAULT_CONTENT = `# Welcome to MarkFlow Editor
 
@@ -97,7 +97,6 @@ export function MarkdownEditor({
   const [layout, setLayout] = useState<EditorLayout>(layoutProp)
   const [theme, setTheme] = useState<EditorTheme>(themeProp)
   const [editorScrollRatio, setEditorScrollRatio] = useState<number>(0)
-  const [previewScrollRatio, setPreviewScrollRatio] = useState<number>(0)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [guideOpen, setGuideOpen] = useState(false)
   const [workerUrl, setWorkerUrl] = useState<string>('')
@@ -124,6 +123,9 @@ export function MarkdownEditor({
 
   // Ref to CodeMirror EditorView
   const editorViewRef = useRef<EditorView | null>(null)
+  // Ref to PreviewPane for heading-based scroll sync
+  const previewRef = useRef<PreviewPaneHandle | null>(null)
+  const lastHeadingRef = useRef<string | null>(null)
 
   // Resolve image upload function
   const resolveUploader = useCallback((): ((file: File) => Promise<string>) | null => {
@@ -146,8 +148,30 @@ export function MarkdownEditor({
     applyToolbarAction(editorViewRef.current, action)
   }, [])
 
-  const handleEditorScroll = useCallback((ratio: number) => {
-    setPreviewScrollRatio(ratio)
+  const handleEditorCursorSync = useCallback(() => {
+    const view = editorViewRef.current
+    if (!view) return
+
+    // 커서 위치에서 가장 가까운 헤딩을 역방향 탐색
+    const cursorPos = view.state.selection.main.head
+    const doc = view.state.doc
+    let foundHeading: string | null = null
+
+    for (let pos = cursorPos; pos >= 0; ) {
+      const line = doc.lineAt(pos)
+      const match = /^#{1,6}\s+(.+)/.exec(line.text)
+      if (match?.[1]) {
+        foundHeading = match[1].trim()
+        break
+      }
+      if (line.number <= 1) break
+      pos = doc.line(line.number - 1).from
+    }
+
+    if (foundHeading && foundHeading !== lastHeadingRef.current) {
+      lastHeadingRef.current = foundHeading
+      previewRef.current?.scrollToHeading(foundHeading)
+    }
   }, [])
 
   const handlePreviewScroll = useCallback((ratio: number) => {
@@ -355,7 +379,7 @@ export function MarkdownEditor({
                 theme={theme}
                 placeholder={placeholder}
                 readOnly={readOnly}
-                onScrollRatio={handleEditorScroll}
+                onScrollRatio={handleEditorCursorSync}
                 scrollRatio={editorScrollRatio}
                 onImageFile={handleImageUpload}
               />
@@ -377,9 +401,9 @@ export function MarkdownEditor({
             </div>
             <div className="mf-pane-content">
               <PreviewPane
+                ref={previewRef}
                 markdown={markdown}
                 theme={theme}
-                scrollRatio={previewScrollRatio}
                 onScrollRatio={handlePreviewScroll}
               />
             </div>

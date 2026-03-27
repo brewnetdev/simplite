@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useWorkspaceStore } from '../../stores/workspace-store';
 import type { Workspace } from '../../lib/types';
 import { CreateWorkspaceModal } from '../../components/create-workspace-modal';
@@ -65,7 +64,7 @@ function WorkspaceRow({ workspace }: { workspace: Workspace }) {
 
   return (
     <Link
-      href={`/${slug}`}
+      href={`/${slug}/docs`}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -126,7 +125,6 @@ function WorkspaceRow({ workspace }: { workspace: Workspace }) {
 }
 
 export default function WorkspaceListPage() {
-  const router = useRouter();
   const { workspaces, isLoading, fetchWorkspaces } = useWorkspaceStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -134,15 +132,8 @@ export default function WorkspaceListPage() {
     void fetchWorkspaces();
   }, [fetchWorkspaces]);
 
-  // FR-003: 워크스페이스 1개일 때 자동 리다이렉트
-  useEffect(() => {
-    if (!isLoading && workspaces.length === 1) {
-      const ws = workspaces[0];
-      if (ws?.slug) {
-        router.replace(`/${ws.slug}`);
-      }
-    }
-  }, [isLoading, workspaces, router]);
+  // FR-003: 자동 리다이렉트는 로그인 페이지에서 처리
+  // 워크스페이스 목록 페이지는 항상 목록을 표시
 
   return (
     <div style={{ maxWidth: '680px', margin: '0 auto', padding: '60px 24px' }}>
@@ -277,7 +268,6 @@ export default function WorkspaceListPage() {
         onClose={() => setShowCreateModal(false)}
       />
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

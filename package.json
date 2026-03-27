@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.15.0",
   "scripts": {
-    "dev": "turbo dev",
+    "dev": "lsof -ti:3002 -ti:4000 | xargs kill -9 2>/dev/null; turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test"
